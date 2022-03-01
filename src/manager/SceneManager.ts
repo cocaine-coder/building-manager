@@ -1,11 +1,12 @@
 import { ArcRotateCamera, Camera, Scene, Vector3 } from "@babylonjs/core";
 import SkyManager from "./SkyManager";
-import SimpleManagerBase from "./SimpleManagerBase";
+import SimpleManager from "./SimpleManager";
 import StreetLightManager from "./StreetLightManager";
 
 import downspoutUrl from '../assets/model/env/downspout.glb?url'
 import groundUrl from '../assets/model/env/ground.glb?url'
 import guardUrl from '../assets/model/env/guard.glb?url'
+import lightUrl from '../assets/model/env/light.glb?url'
 import manholecoverUrl from '../assets/model/env/manholecover.glb?url'
 import parklineUrl from '../assets/model/env/parkline.glb?url'
 
@@ -18,13 +19,13 @@ export default class SceneManager {
     private declare scene: Scene;
     private declare camera: Camera;
     private declare sky: SkyManager;
-    private declare ground:SimpleManagerBase;
-    private declare downspout : SimpleManagerBase;
-    private declare guard : SimpleManagerBase;
-    private declare manholecover : SimpleManagerBase;
-    private declare parkline : SimpleManagerBase;
+    private declare ground: SimpleManager;
+    private declare downspout: SimpleManager;
+    private declare guard: SimpleManager;
+    private declare manholecover: SimpleManager;
+    private declare parkline: SimpleManager;
 
-    private declare light : StreetLightManager;
+    private declare light: StreetLightManager;
 
     private constructor() {
     }
@@ -42,34 +43,44 @@ export default class SceneManager {
 
         this.addWindowKeyboardEvent(this.sky);  // 添加键盘事件
 
-        this.downspout = new SimpleManagerBase(scene,downspoutUrl)
-        await this.downspout.loadAsync();
 
-        this.ground = new SimpleManagerBase(scene,groundUrl);
+
+        this.ground = new SimpleManager(scene, groundUrl);
         await this.ground.loadAsync();
 
-        this.guard = new SimpleManagerBase(scene,guardUrl);
+        this.guard = new SimpleManager(scene, guardUrl);
         await this.guard.loadAsync();
 
-        this.manholecover = new SimpleManagerBase(scene,manholecoverUrl);
+        this.manholecover = new SimpleManager(scene, manholecoverUrl);
         await this.manholecover.loadAsync();
 
-        this.parkline = new SimpleManagerBase(scene,parklineUrl);
+        this.parkline = new SimpleManager(scene, parklineUrl);
         await this.parkline.loadAsync();
+
+        this.downspout = new SimpleManager(scene, downspoutUrl)
+        await this.downspout.loadAsync();
 
         this.light = new StreetLightManager(scene);
         await this.light.loadAsync();
 
-        const main = new SimpleManagerBase(scene,mainUrl);
+        const main = new SimpleManager(scene, mainUrl);
         await main.loadAsync();
     }
 
-    private addWindowKeyboardEvent(sky:SkyManager) {
+    private addWindowKeyboardEvent(sky: SkyManager) {
         window.addEventListener('keydown', e => {
             switch (e.keyCode) {
-                case 49: sky.change('day'); break;
-                case 50: sky.change('sunset'); break;
-                case 51: sky.change('night'); break;
+                case 49:
+                    sky.change('day');
+                    this.light.setLightEnable(false);
+                    break;
+                case 50:
+                    sky.change('sunset');
+                    this.light.setLightEnable(true);
+                    break;
+                case 51: sky.change('night');
+                    this.light.setLightEnable(true);
+                    break;
             }
         })
     }
