@@ -1,8 +1,8 @@
-import { Mesh, MultiMaterial, Node, Scene, SceneLoader, StandardMaterial } from "@babylonjs/core";
+import { AbstractMesh, Mesh, MultiMaterial, Scene, SceneLoader } from "@babylonjs/core";
 import { groupby } from "../utils/ArrayExtension";
 
 export default class SimpleManager {
-    protected parentNodes = new Array<Node>();
+    protected parentMeshes = new Array<AbstractMesh>();
 
     /**
      *
@@ -23,7 +23,7 @@ export default class SimpleManager {
             meshMap.forEach((meshGroup, key) => {
 
                 if (meshGroup.length < 2) {
-                    this.parentNodes.push(meshGroup[0]);
+                    this.parentMeshes.push(meshGroup[0]);
                     return;
                 }
 
@@ -31,28 +31,28 @@ export default class SimpleManager {
                     // 合并mesh
                     let mesh = Mesh.MergeMeshes(meshGroup, true, true, undefined, false, true);
                     if (mesh)
-                        this.parentNodes.push(mesh);
+                        this.parentMeshes.push(mesh);
                 } catch (error) {
                     console.error(error);
                 }
             });
 
         } else {
-            this.parentNodes.push(...container.meshes);
+            this.parentMeshes.push(...container.meshes);
 
             container.meshes.forEach(mesh => {
                 this.scene.addMesh(mesh);
             })
         }
 
-        this.parentNodes.forEach(node => {
-            const material = (node as any).material;
-            if(!material) return;
+        this.parentMeshes.forEach(mesh => {
+            const material = mesh.material;
+            if (!material) return;
 
             if (material instanceof MultiMaterial) {
                 material.getChildren().forEach(child => (child as any).maxSimultaneousLights = 12);
             } else {
-                material.maxSimultaneousLights = 12;
+                (material as any).maxSimultaneousLights = 12;
             }
         })
 
@@ -63,9 +63,9 @@ export default class SimpleManager {
      * 关闭整个父节点
      *
      * @param {boolean} value
-     * @memberof BaseNodesManager
+     * @memberof SimpleManager
      */
     setEnabled(value: boolean) {
-        this.parentNodes.forEach(node => node.setEnabled(value));
+        this.parentMeshes.forEach(mesh => mesh.setEnabled(value));
     }
 }

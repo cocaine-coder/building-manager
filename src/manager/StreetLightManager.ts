@@ -1,29 +1,19 @@
-import { AbstractMesh, Color3, Mesh, Scene, SpotLight, StandardMaterial, Vector3 } from "@babylonjs/core";
+import { Color3, Mesh, Scene, SpotLight, Vector3 } from "@babylonjs/core";
 import NodeNameConfig from "./config/NodeNameConfig";
-import SimpleManagerBase from "./SimpleManager";
+import SimpleManager from "./SimpleManager";
 
 import lightUrl from '../assets/model/env/light.glb?url';
 
-const customLightUrl = "https://assets.babylonjs.com/meshes/lamp.babylon";
-
-const copyInfos: Array<{ positionX: number, positionZ: number, rotationY: number }> = [
-    { positionX: 31, positionZ: -24, rotationY: 0 },
-    { positionX: 28.5, positionZ: -56, rotationY: 0 },
-    { positionX: 28, positionZ: -88, rotationY: 0 }
-]
-
-export default class extends SimpleManagerBase {
+export default class extends SimpleManager {
     constructor(scene: Scene) {
         super(scene, lightUrl, false);
 
         this.onLoaded = () => {
 
-            this.parentNodes.forEach(node => {
-                if (node.name.endsWith('1') && node.name.indexOf('.0') !== -1) {
+            this.parentMeshes.forEach(mesh => {
+                if (mesh.name.endsWith('1') && mesh.name.indexOf('.0') !== -1) {
 
-                    const parent = node as Mesh;
-
-                    const localPositions = parent.getFacetLocalPositions();
+                    const localPositions = mesh.getFacetLocalPositions();
                     let position = Vector3.Zero();
                     localPositions.forEach(p => {
                         position.x -= p.y / localPositions.length;

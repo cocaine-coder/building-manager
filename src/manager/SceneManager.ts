@@ -1,4 +1,4 @@
-import { ArcRotateCamera, Camera, Scene, Vector3 } from "@babylonjs/core";
+import { ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core";
 import SkyManager from "./SkyManager";
 import SimpleManager from "./SimpleManager";
 import StreetLightManager from "./StreetLightManager";
@@ -6,19 +6,19 @@ import StreetLightManager from "./StreetLightManager";
 import downspoutUrl from '../assets/model/env/downspout.glb?url'
 import groundUrl from '../assets/model/env/ground.glb?url'
 import guardUrl from '../assets/model/env/guard.glb?url'
-import lightUrl from '../assets/model/env/light.glb?url'
 import manholecoverUrl from '../assets/model/env/manholecover.glb?url'
 import parklineUrl from '../assets/model/env/parkline.glb?url'
+import MainBuildingManager from "./MainBuildingManager";
 
-import mainUrl from '../assets/model/env/main.glb?url'
-
+type ManagerType = "ground" | "downspout" | "guard" | "manholecover" | "parkline" | "light" | "mainbuilding"
 
 export default class SceneManager {
 
     private static _instance: SceneManager;
     private declare scene: Scene;
-    private declare camera: Camera;
+    private declare camera: ArcRotateCamera;
     private declare sky: SkyManager;
+
     private declare ground: SimpleManager;
     private declare downspout: SimpleManager;
     private declare guard: SimpleManager;
@@ -26,6 +26,9 @@ export default class SceneManager {
     private declare parkline: SimpleManager;
 
     private declare light: StreetLightManager;
+    private declare mainbuilding: MainBuildingManager;
+
+    private declare managerMap: Map<ManagerType, SimpleManager>;
 
     private constructor() {
     }
@@ -38,12 +41,9 @@ export default class SceneManager {
 
     async init(scene: Scene) {
         this.scene = scene;
+        this.managerMap = new Map<ManagerType, SimpleManager>();
         this.createMainCamera(scene);   // 创建相机
         this.sky = new SkyManager(scene);   // 创建天空
-
-        this.addWindowKeyboardEvent(this.sky);  // 添加键盘事件
-
-
 
         this.ground = new SimpleManager(scene, groundUrl);
         await this.ground.loadAsync();
@@ -63,26 +63,61 @@ export default class SceneManager {
         this.light = new StreetLightManager(scene);
         await this.light.loadAsync();
 
-        const main = new SimpleManager(scene, mainUrl);
-        await main.loadAsync();
+        this.mainbuilding = new MainBuildingManager(scene, this);
+        await this.mainbuilding.loadAsync();
+
+        this.addWindowKeyboardEvent();  // 添加键盘事件
+
+        this.managerMap.set('ground', this.ground);
+        this.managerMap.set('guard', this.guard);
+        this.managerMap.set('manholecover', this.manholecover);
+        this.managerMap.set('parkline', this.parkline);
+        this.managerMap.set('downspout', this.downspout);
+        this.managerMap.set('light', this.light);
+        this.managerMap.set('mainbuilding', this.mainbuilding);
     }
 
-    private addWindowKeyboardEvent(sky: SkyManager) {
+    setEnable(value: boolean, ...excepts: ManagerType[]) {
+        this.managerMap.forEach((manager, key) => {
+            if (excepts.indexOf(key) == -1)
+                manager.setEnabled(value);
+            else
+                manager.setEnabled(!value);
+        })
+    }
+
+    private addWindowKeyboardEvent() {
         window.addEventListener('keydown', e => {
             switch (e.keyCode) {
-                case 49:
-                    sky.change('day');
+                case 27:    //esc 恢复原状
+                    this.goOrigin(); break;
+                case 49:    // 1 白天
+                    this.sky.change('day');
                     this.light.setLightEnable(false);
                     break;
-                case 50:
-                    sky.change('sunset');
+                case 50:    // 2 日落
+                    this.sky.change('sunset');
                     this.light.setLightEnable(true);
                     break;
-                case 51: sky.change('night');
+                case 51:    // 3 黑天 
+                    this.sky.change('night');
                     this.light.setLightEnable(true);
+                    break;
+                case 57:    // 9 进入透明模式
+                    this.mainbuilding.setTransparent(); break;
+                case 48:    // 0 恢复material
+                    this.mainbuilding.setTransparent(1);
                     break;
             }
         })
+    }
+
+    private goOrigin(){
+        this.mainbuilding.goBack();
+
+        this.camera.alpha = Math.PI / 2;
+        this.camera.beta = Math.PI / 2.2;
+        this.camera.radius = 100;
     }
 
     /**
