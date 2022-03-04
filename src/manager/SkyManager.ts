@@ -1,4 +1,4 @@
-import { Scene, Mesh, Animation, Light, HemisphericLight, Vector3 } from "@babylonjs/core";
+import { Scene, Mesh, Animation, Light, HemisphericLight, Vector3, Color3 } from "@babylonjs/core";
 import { SkyMaterial } from "@babylonjs/materials";
 import NodeNameConfig from "./config/NodeNameConfig";
 
@@ -55,7 +55,7 @@ export default class SkyManager {
             case "night":
                 this.setSkyConfig("material.inclination", this.skyboxMaterial.inclination, 0.5);
                 this.skyboxMaterial.turbidity = 0;
-                this.setEnvLightConfig(this.envLight.intensity, 0.01);
+                this.setEnvLightConfig(this.envLight.intensity, 0.05);
                 break;
         }
     }

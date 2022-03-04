@@ -29,8 +29,8 @@ export default class extends SimpleManager {
                         500,
                         this.scene);
 
-                    lampLight.diffuse = Color3.Yellow();
-                    lampLight.intensity = 200;
+                    lampLight.diffuse = Color3.FromHexString("#FF8C00");
+                    lampLight.intensity = 1000;
                 }
             })
 
@@ -40,8 +40,6 @@ export default class extends SimpleManager {
 
     setEnabled(value: boolean): void {
         super.setEnabled(value);
-        if (!value)
-            this.setLightEnable(false);
     }
 
     setLightEnable(value: boolean) {
