@@ -4,20 +4,19 @@
 import { Scene } from '@babylonjs/core';
 import SceneComponent from './components/SceneComponent.vue';
 import SceneManager from './manager/SceneManager';
-import Board from './components/base/Board.vue';
+import Example from './components/base/Example.vue';
+
+const show3D = false;
 
 function onSceneReady(scene: Scene) {
   SceneManager.Instance.init(scene);
-}
-
-function handleTest(){
-  console.log(123);
 }
 
 </script>
 
 <template>
   <SceneComponent
+    v-if="show3D"
     class="scene-container"
     :onSceneReady="onSceneReady"
     :onRender="undefined"
@@ -26,9 +25,7 @@ function handleTest(){
   ></SceneComponent>
 
   <div id="controls">
-    <Board width="30px" height="300px" :alpha="0.1" radius="15px">
-      <button @click="handleTest">click</button>
-    </Board>
+    <Example></Example>
   </div>
 </template>
 
@@ -53,6 +50,5 @@ body {
   top: 0;
   width:100%;
   height: 100%;
-  pointer-events:none;
 }
 </style>
