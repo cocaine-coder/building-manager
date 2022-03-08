@@ -1,4 +1,4 @@
-<script lang="ts" setup>import { computed, ref } from 'vue';
+<script lang="ts" setup>
 
 import SvgIcon from './SvgIcon.vue';
 

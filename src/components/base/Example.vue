@@ -5,12 +5,16 @@ import SvgIcon from './SvgIcon.vue';
 
 import IconLabel from './IconLabel.vue'
 import LineRate from './shape/LineRate.vue';
+import CircleSlider from './shape/CircleSlider.vue';
+import { ref } from 'vue';
+import MultilineCircleRate from './shape/MultilineCircleRate.vue';
+import CircleRate from './shape/CircleRate.vue';
 
-import svgUrl from '../../assets/icons/mail.svg?url'
-
-function handleClick(message?: string) {
+function handleClick(message?: any) {
     console.log("click handle", message);
 }
+
+const value = ref(20);
 
 </script>
 
@@ -38,7 +42,50 @@ function handleClick(message?: string) {
             <template #title>
                 <h3 id="title">rate</h3>
             </template>
-            <LineRate :rate="50" outColor="#43464B"></LineRate>
+            <LineRate :rate="50" mainColor="#43464B"></LineRate>
+        </Card>
+
+        <CircleSlider v-model="value" mainColor="#43464B"></CircleSlider>
+        <div>
+            <input type="number" v-model="value" style="width:100px" />
+        </div>
+
+        <Card style="width: 200px;">
+            <template #title>
+                <h3 id="title">station</h3>
+            </template>
+            <MultilineCircleRate
+                :values="[
+                { color: '#43D1A7', val: 30 },
+                { color: '#43464C', val: 70 }]"
+                :size="50"
+                :empty="0.125"
+                :lineWidth="5"
+            ></MultilineCircleRate>
+            <span>&nbsp;</span>
+            <MultilineCircleRate
+                :values="[
+                { color: '#43D1A7', val: 30 },
+                { color: '#43464C', val: 70 }]"
+                :size="50"
+                :empty="0.125"
+                :lineWidth="5"
+                text="40%"
+            ></MultilineCircleRate>
+            <span>&nbsp;</span>
+            <MultilineCircleRate
+                :values="[
+                { color: '#455DDC', val: 40 },
+                { color: '#9646EF', val: 20 },
+                { color: '#FF852E', val: 15 },
+                { color: '#43D1A7', val: 20 },
+                { color: '#727C94', val: 5 }]"
+                :size="50"
+                :empty="0.125"
+                :lineWidth="5"
+            ></MultilineCircleRate>
+
+            <CircleRate :size="50" :processWidth="5" :rate="value"></CircleRate>
         </Card>
     </div>
 </template>

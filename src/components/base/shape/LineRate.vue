@@ -6,13 +6,13 @@ import { getRangeValue } from '../../../utils/Calculation'
 const props = withDefaults(defineProps<{
     rate?: number,
     height?: number,
-    outColor?: string,
-    innerColor?: string,
+    mainColor?: string,
+    rateColor?: string,
 }>(), {
     rate: 0,
     height: 5,
-    outColor: '#000000',
-    innerColor: '#455DDC',
+    mainColor: '#000000',
+    rateColor: '#455DDC',
 })
 
 const rate = getRangeValue(props.rate, 0, 100);
@@ -23,11 +23,11 @@ const outdiv = ref<HTMLDivElement>();
 
 <template>
     <div
-        :style="{ borderRadius: `${height}px`, height: `${height}px`, width: '100%', backgroundColor: outColor }"
+        :style="{ borderRadius: `${height}px`, height: `${height}px`, width: '100%', backgroundColor: mainColor }"
         ref="outdiv"
     >
         <div
-            :style="{ borderRadius: `${height}px`, height: `${height}px`, width: `${rate}%`, backgroundColor: innerColor }"
+            :style="{ borderRadius: `${height}px`, height: `${height}px`, width: `${rate}%`, backgroundColor: rateColor }"
         ></div>
     </div>
 </template>

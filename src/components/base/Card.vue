@@ -4,7 +4,7 @@ const props = defineProps({
         default: 0.8
     },
     radius: {
-        default: 20
+        default: 10
     }
 })
 
@@ -23,7 +23,7 @@ const radiusValue = `${props.radius}px`;
 
 <style scoped>
 .card {
-    padding: 20px;
+    padding: 10px 20px;
     background: rgba(34, 37, 43, v-bind(alpha));
     backdrop-filter: saturate(200%) blur(10px) brightness(50%);
     border-radius: v-bind(radiusValue);
