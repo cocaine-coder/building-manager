@@ -1,9 +1,9 @@
-import { AbstractMesh, ActionManager, Color3, InterpolateValueAction, Mesh, Scene, SceneLoader, StandardMaterial, Vector3 } from "@babylonjs/core";
+import { AbstractMesh, Color3, Scene, SceneLoader, StandardMaterial, Vector3 } from "@babylonjs/core";
 
-import JASModel from '../assets/model/infos/JAS.glb?url'
-import JSOfficeModel from '../assets/model/infos/JSOffice.glb?url'
-import OtherModel from '../assets/model/infos/Other.glb?url'
-import SHCHModel from '../assets/model/infos/SHCH.glb?url'
+import JASModel from '../../assets/model/infos/3f/JAS.glb?url'
+import JSOfficeModel from '../../assets/model/infos/3f/JSOffice.glb?url'
+import OtherModel from '../../assets/model/infos/3f/Other.glb?url'
+import SHCHModel from '../../assets/model/infos/3f/SHCH.glb?url'
 
 type MarkMeshType = "company" | "webcam" | "office";
 type ResourceType = "point" | "url"
@@ -139,7 +139,7 @@ export default class MarkMeshConfig {
     }
 }
 
-export type{
+export type {
     MarkMesh,
     MarkMeshType
 }

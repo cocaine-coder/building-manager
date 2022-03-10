@@ -7,9 +7,9 @@ import SceneManager from './manager/SceneManager';
 import Example from './components/base/Example.vue';
 
 import { ref } from 'vue'
-import { NConfigProvider, darkTheme, NSwitch } from 'naive-ui'
+import { NConfigProvider, darkTheme, NSwitch, NTooltip, NButton, NUl, NLi, NH2 } from 'naive-ui'
 
-const show3D = ref(false);
+const show3D = ref(true);
 
 function onSceneReady(scene: Scene) {
   SceneManager.Instance.init(scene);
@@ -28,7 +28,23 @@ function onSceneReady(scene: Scene) {
   ></SceneComponent>
 
   <div id="controls">
-    <n-config-provider :theme="undefined">
+    <n-config-provider :theme="darkTheme">
+      <n-tooltip placement="bottom" trigger="hover">
+        <template #trigger>
+          <n-button strong secondary round type="success" color="black">帮助</n-button>
+        </template>
+        <n-ul>
+          <n-li>1 - 白天</n-li>
+          <n-li>2 - 日落</n-li>
+          <n-li>3 - 黑夜</n-li>
+          <n-li>9 - 透明模式</n-li>
+          <n-li>0 - 不透明模式</n-li>
+          <n-li>双击楼体 - 进入单层模式</n-li>
+          <n-li>esc - 退至初始状态</n-li>
+        </n-ul>
+      </n-tooltip>
+    </n-config-provider>
+    <n-config-provider :theme="undefined" v-if="!show3D">
       <n-switch v-model:value="show3D"></n-switch>
       <label>{{ show3D ? '显示控件demo' : '显示3D' }}</label>
       <Example v-if="!show3D"></Example>

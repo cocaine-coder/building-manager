@@ -1,5 +1,6 @@
 import { AbstractMesh, ActionManager, Color3, ExecuteCodeAction, InterpolateValueAction, Material, Scene, StandardMaterial, Vector3 } from "@babylonjs/core";
 import SimpleManager from "./SimpleManager";
+import MarkMeshConfig, { MarkMeshType } from './config/MarkMeshConfig';
 
 import mainUrl from '../assets/model/env/main.glb?url'
 import SceneManager from "./SceneManager";
@@ -19,7 +20,9 @@ export default class extends SimpleManager {
                     if (mesh.name !== "9_primitive0_merged")
                         this.registAction4YKDSMesh(mesh);
                 }
-            })
+            });
+
+            MarkMeshConfig.Instance.init(scene);
         }
     }
 
@@ -50,8 +53,36 @@ export default class extends SimpleManager {
         if (this.currentFloorMesh) {
             this.registAction4YKDSMesh(this.currentFloorMesh);
             this.sceneManager.setEnable(true);
+            this.currentFloorMesh.getChildMeshes().forEach(mesh=>mesh.isVisible = false);
             this.currentFloorMesh = undefined;
         }
+    }
+
+    getCurrentFloorMarkMesheTypes(name: string): IterableIterator<MarkMeshType> | undefined {
+        const typeMeshes = MarkMeshConfig.Instance.MarkMeshMap.get(name);
+        if (typeMeshes) {
+            return typeMeshes.keys();
+        }
+    }
+
+    showCurrentFloorMarkMeshes(name: string, types: Array<MarkMeshType>) {
+        if (!MarkMeshConfig.Instance.MarkMeshMap) return;
+
+        const currentFloorMarkMeshes = MarkMeshConfig.Instance.MarkMeshMap.get(name);
+        const currentFloorMesh = this.scene.meshes.find(mesh => mesh.name === name);
+        if (!currentFloorMarkMeshes || !currentFloorMesh) return;
+
+        currentFloorMesh.getChildren().forEach(node => (node as AbstractMesh).isVisible = false);
+        console.log(currentFloorMesh.getChildren());
+        types.forEach(type => {
+            const typeMarkMeshes = currentFloorMarkMeshes.get(type);
+            if (!typeMarkMeshes) return;
+
+            typeMarkMeshes.forEach(mark => {
+                mark.mesh!.setEnabled(true)
+                mark.mesh!.isVisible = true;
+            });
+        })
     }
 
     private registAction4YKDSMesh(mesh: AbstractMesh) {
@@ -73,6 +104,8 @@ export default class extends SimpleManager {
                 pointMesh.actionManager?.unregisterAction(pointMesh.actionManager!.actions[0]);
             }
             pointMesh.actionManager?.dispose();
+
+            this.showCurrentFloorMarkMeshes(pointMesh.name, ["company", "office"]);
 
             // 设置只显示主楼
             this.sceneManager.setEnable(false, 'mainbuilding');
