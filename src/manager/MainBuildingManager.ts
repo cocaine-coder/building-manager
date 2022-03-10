@@ -105,6 +105,9 @@ export default class extends SimpleManager {
             mesh.setEnabled(mesh.id === gotoMesh.id);
         })
 
+        if (this.currentControl)
+            this.advancedTexture.removeControl(this.currentControl);
+
         this.iotShowerStore.show = false;
     }
 
