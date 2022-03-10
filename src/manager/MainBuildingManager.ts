@@ -1,4 +1,6 @@
-import { AbstractMesh, ActionManager, Color3, ExecuteCodeAction, InterpolateValueAction, Material, Scene, StandardMaterial, Vector3 } from "@babylonjs/core";
+import { AbstractMesh, ActionManager, Color3, ExecuteCodeAction, InterpolateValueAction, Material, Mesh, Scene, StandardMaterial, Vector3 } from "@babylonjs/core";
+import { AdvancedDynamicTexture, Control, Rectangle, TextBlock } from '@babylonjs/gui';
+
 import SimpleManager from "./SimpleManager";
 import MarkMeshConfig, { MarkMeshType } from './config/MarkMeshConfig';
 
@@ -13,6 +15,10 @@ export default class extends SimpleManager {
     private currentFloorMesh: AbstractMesh | undefined;
     private iotShowerStore = useIOTShowerStore();
     private floorStore = useFloorStore();
+    private advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
+    //temp
+    private currentControl: Control | undefined;
 
     constructor(scene: Scene, private sceneManager: SceneManager) {
         super(scene, mainUrl);
@@ -60,6 +66,9 @@ export default class extends SimpleManager {
             this.currentFloorMesh.getChildMeshes().forEach(mesh => mesh.isVisible = false);
             this.currentFloorMesh = undefined;
 
+            if (this.currentControl)
+                this.advancedTexture.removeControl(this.currentControl);
+
             this.iotShowerStore.show = true;
             this.floorStore.meshName = '';
         }
@@ -86,7 +95,7 @@ export default class extends SimpleManager {
         }
         gotoMesh.actionManager?.dispose();
 
-        this.showCurrentFloorMarkMeshes(gotoMesh.name, ["company", "office"]);
+        this.showCurrentFloorMarkMeshes(gotoMesh.name, ["company"]);
 
         // 设置只显示主楼
         this.sceneManager.setEnable(false, 'mainbuilding');
@@ -120,8 +129,35 @@ export default class extends SimpleManager {
             if (!typeMarkMeshes) return;
 
             typeMarkMeshes.forEach(mark => {
-                mark.mesh!.setEnabled(true)
-                mark.mesh!.isVisible = true;
+                if (mark.mesh) {
+                    mark.mesh.setEnabled(true)
+                    mark.mesh.isVisible = true;
+
+                    if (!mark.mesh.actionManager) {
+                        mark.mesh.actionManager = new ActionManager(this.scene);
+                        mark.mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, event => {
+                            if (this.currentControl)
+                                this.advancedTexture.removeControl(this.currentControl);
+
+                            var rect1 = new Rectangle();
+                            rect1.width = "250px";
+                            rect1.height = "40px";
+                            rect1.cornerRadius = 20;
+                            rect1.color = "Orange";
+                            // rect1.thickness = 4;
+                            rect1.background = "#5b5c5f";
+                            this.advancedTexture.addControl(rect1);
+                            rect1.linkWithMesh(mark.mesh!);
+                            rect1.linkOffsetY = -50;
+
+                            var label = new TextBlock();
+                            label.text = mark.message;
+                            rect1.addControl(label);
+
+                            this.currentControl = rect1;
+                        }))
+                    }
+                }
             });
         })
     }
