@@ -6,7 +6,10 @@ import SceneComponent from './components/SceneComponent.vue';
 import SceneManager from './manager/SceneManager';
 import Example from './components/base/Example.vue';
 
-const show3D = false;
+import { ref } from 'vue'
+import { NConfigProvider, darkTheme, NSwitch } from 'naive-ui'
+
+const show3D = ref(false);
 
 function onSceneReady(scene: Scene) {
   SceneManager.Instance.init(scene);
@@ -25,7 +28,11 @@ function onSceneReady(scene: Scene) {
   ></SceneComponent>
 
   <div id="controls">
-    <Example></Example>
+    <n-config-provider :theme="undefined">
+      <n-switch v-model:value="show3D"></n-switch>
+      <label>{{ show3D ? '显示控件demo' : '显示3D' }}</label>
+      <Example v-if="!show3D"></Example>
+    </n-config-provider>
   </div>
 </template>
 
@@ -34,6 +41,9 @@ html,
 body {
   margin: 0;
   height: 100vh;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  user-select: none;
 }
 
 #app {
@@ -46,9 +56,14 @@ body {
 }
 
 #controls {
-  position:absolute;
+  position: absolute;
   top: 0;
-  width:100%;
+  width: 100%;
   height: 100%;
+  pointer-events: none;
+}
+
+#controls > * {
+  pointer-events: visible;
 }
 </style>

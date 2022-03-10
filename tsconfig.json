@@ -5,6 +5,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "strict": true,
+    "types": ["naive-ui/volar"],
     "jsx": "preserve",
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
