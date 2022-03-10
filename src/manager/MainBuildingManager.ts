@@ -4,11 +4,15 @@ import MarkMeshConfig, { MarkMeshType } from './config/MarkMeshConfig';
 
 import mainUrl from '../assets/model/env/main.glb?url'
 import SceneManager from "./SceneManager";
+import { useIOTShowerStore } from "../stores/IOTStore";
+import { useFloorStore } from '../stores/FloorStore';
 
 export default class extends SimpleManager {
 
     private originMaterials: Map<string, Material> = new Map<string, Material>();
     private currentFloorMesh: AbstractMesh | undefined;
+    private iotShowerStore = useIOTShowerStore();
+    private floorStore = useFloorStore();
 
     constructor(scene: Scene, private sceneManager: SceneManager) {
         super(scene, mainUrl);
@@ -53,9 +57,46 @@ export default class extends SimpleManager {
         if (this.currentFloorMesh) {
             this.registAction4YKDSMesh(this.currentFloorMesh);
             this.sceneManager.setEnable(true);
-            this.currentFloorMesh.getChildMeshes().forEach(mesh=>mesh.isVisible = false);
+            this.currentFloorMesh.getChildMeshes().forEach(mesh => mesh.isVisible = false);
             this.currentFloorMesh = undefined;
+
+            this.iotShowerStore.show = true;
+            this.floorStore.meshName = '';
         }
+    }
+
+    goTo(mesh: AbstractMesh | string) {
+        const gotoMesh = mesh instanceof AbstractMesh ? mesh : this.scene.getMeshByName(mesh);
+        if (!gotoMesh || this.parentMeshes.findIndex(m => m.name === gotoMesh.name) === -1)
+            return;
+
+        this.floorStore.meshName = gotoMesh.name;
+        if (this.currentFloorMesh) {
+            this.registAction4YKDSMesh(this.currentFloorMesh);
+            this.currentFloorMesh?.getChildMeshes().forEach(mesh => mesh.isVisible = false);
+        }
+
+        this.currentFloorMesh = gotoMesh;
+        // 设置当前选中主楼的mesh Id
+        gotoMesh.scaling = new Vector3(1, 1, 1);
+
+        // 删除选中mesh的所有事件
+        while (gotoMesh.actionManager!.actions.length > 0) {
+            gotoMesh.actionManager?.unregisterAction(gotoMesh.actionManager!.actions[0]);
+        }
+        gotoMesh.actionManager?.dispose();
+
+        this.showCurrentFloorMarkMeshes(gotoMesh.name, ["company", "office"]);
+
+        // 设置只显示主楼
+        this.sceneManager.setEnable(false, 'mainbuilding');
+
+        // 其他mesh隐藏
+        this.parentMeshes.forEach(mesh => {
+            mesh.setEnabled(mesh.id === gotoMesh.id);
+        })
+
+        this.iotShowerStore.show = false;
     }
 
     getCurrentFloorMarkMesheTypes(name: string): IterableIterator<MarkMeshType> | undefined {
@@ -73,7 +114,7 @@ export default class extends SimpleManager {
         if (!currentFloorMarkMeshes || !currentFloorMesh) return;
 
         currentFloorMesh.getChildren().forEach(node => (node as AbstractMesh).isVisible = false);
-        console.log(currentFloorMesh.getChildren());
+
         types.forEach(type => {
             const typeMarkMeshes = currentFloorMarkMeshes.get(type);
             if (!typeMarkMeshes) return;
@@ -94,26 +135,7 @@ export default class extends SimpleManager {
         // 左键点击 
         mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnDoublePickTrigger, event => {
             const pointMesh = event.meshUnderPointer!;
-            this.currentFloorMesh = pointMesh;
-
-            // 设置当前选中主楼的mesh Id
-            pointMesh.scaling = new Vector3(1, 1, 1);
-
-            // 删除选中mesh的所有事件
-            while (pointMesh.actionManager!.actions.length > 0) {
-                pointMesh.actionManager?.unregisterAction(pointMesh.actionManager!.actions[0]);
-            }
-            pointMesh.actionManager?.dispose();
-
-            this.showCurrentFloorMarkMeshes(pointMesh.name, ["company", "office"]);
-
-            // 设置只显示主楼
-            this.sceneManager.setEnable(false, 'mainbuilding');
-
-            // 其他mesh隐藏
-            this.parentMeshes.forEach(mesh => {
-                mesh.setEnabled(mesh.id === pointMesh.id);
-            })
+            this.goTo(pointMesh);
         }));
     }
 }

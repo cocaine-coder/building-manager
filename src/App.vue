@@ -1,15 +1,22 @@
 <script setup lang="ts">
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
+import { ref } from 'vue'
+import { NConfigProvider, darkTheme, NSwitch, NTooltip, NButton, NUl, NLi } from 'naive-ui'
+
 import { Scene } from '@babylonjs/core';
 import SceneComponent from './components/SceneComponent.vue';
 import SceneManager from './manager/SceneManager';
-import Example from './components/base/Example.vue';
 
-import { ref } from 'vue'
-import { NConfigProvider, darkTheme, NSwitch, NTooltip, NButton, NUl, NLi, NH2 } from 'naive-ui'
+import { useIOTShowerStore } from './stores/IOTStore'
+
+import Example from './components/base/Example.vue';
+import IOTData from './components/iot/IOTData.vue';
+import Floors from './components/Floors.vue';
+import CarParks from './components/CarParks.vue';
 
 const show3D = ref(true);
+const IOTShower = useIOTShowerStore();
 
 function onSceneReady(scene: Scene) {
   SceneManager.Instance.init(scene);
@@ -27,8 +34,8 @@ function onSceneReady(scene: Scene) {
     adaptToDeviceRatio
   ></SceneComponent>
 
-  <div id="controls">
-    <n-config-provider :theme="darkTheme">
+  <div class="controls">
+    <n-config-provider class="n-controls" :theme="darkTheme">
       <n-tooltip placement="bottom" trigger="hover">
         <template #trigger>
           <n-button strong secondary round type="success" color="black">帮助</n-button>
@@ -43,6 +50,13 @@ function onSceneReady(scene: Scene) {
           <n-li>esc - 退至初始状态</n-li>
         </n-ul>
       </n-tooltip>
+      <div id="monitor" v-if="IOTShower.show">
+        <CarParks id="car-parks"></CarParks>
+        <p></p>
+        <IOTData id="iot-data"></IOTData>
+      </div>
+
+      <Floors id="floors"></Floors>
     </n-config-provider>
     <n-config-provider :theme="undefined" v-if="!show3D">
       <n-switch v-model:value="show3D"></n-switch>
@@ -71,7 +85,8 @@ body {
   width: 100%;
 }
 
-#controls {
+.controls,
+.n-controls {
   position: absolute;
   top: 0;
   width: 100%;
@@ -79,7 +94,19 @@ body {
   pointer-events: none;
 }
 
-#controls > * {
+.n-controls > * {
   pointer-events: visible;
+}
+
+#monitor {
+  position: absolute;
+  bottom: 100px;
+  left: 30px;
+}
+
+#floors {
+  position: absolute;
+  bottom: 200px;
+  right: 30px;
 }
 </style>

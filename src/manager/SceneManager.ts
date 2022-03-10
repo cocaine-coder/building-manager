@@ -112,12 +112,16 @@ export default class SceneManager {
         })
     }
 
-    private goOrigin(){
+    goOrigin(){
         this.mainbuilding.goBack();
 
         this.camera.alpha = Math.PI / 2;
         this.camera.beta = Math.PI / 2.2;
         this.camera.radius = 100;
+    }
+
+    goTo(mainMeshName:string){
+        this.mainbuilding.goTo(mainMeshName);
     }
 
     /**
