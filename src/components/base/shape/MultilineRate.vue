@@ -1,5 +1,6 @@
-<script lang="ts" setup>import { StyleValue } from 'vue';
+<script lang="ts" setup>import { computed, StyleValue } from 'vue';
 
+import { getRangeValue } from '../../../utils/Calculation';
 
 const props = withDefaults(defineProps<{
     height?: number,
@@ -14,16 +15,17 @@ const props = withDefaults(defineProps<{
 })
 
 const sum = props.values.map(x => x.val).reduce((pre, cur) => pre + cur);
+const height = computed(() => getRangeValue(props.height, 7, 15));
 
 function getStyle(index: number) {
     const value = props.values[index];
 
     let style: StyleValue = {
-        height: `${props.height}px`,
+        height: `${height.value}px`,
         width: `${props.width * value.val / sum}px`
     }
 
-    const radius = props.height / 2;
+    const radius = height.value / 2;
 
     if (index === 0) {
         style.borderTopLeftRadius = `${radius}px`;
@@ -39,7 +41,7 @@ function getStyle(index: number) {
         style.transform = "skewX(15deg)";
 
         if (index !== props.values.length - 2) {
-            style.marginRight = `${props.height * Math.tan(15 * Math.PI / 180)}px`;
+            style.marginRight = `${1.5 * height.value * Math.tan(15 * Math.PI / 180)}px`;
         }
     }
 

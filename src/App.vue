@@ -2,7 +2,7 @@
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 import { ref } from 'vue'
-import { NConfigProvider, darkTheme, NSwitch, NTooltip, NButton, NUl, NLi } from 'naive-ui'
+import { NConfigProvider, darkTheme, NSwitch} from 'naive-ui'
 
 import { Scene } from '@babylonjs/core';
 import SceneComponent from './components/SceneComponent.vue';
@@ -14,6 +14,7 @@ import Example from './components/base/Example.vue';
 import IOTData from './components/iot/IOTData.vue';
 import Floors from './components/Floors.vue';
 import CarParks from './components/CarParks.vue';
+import Helper from './components/Helper.vue'
 
 const show3D = ref(true);
 const IOTShower = useIOTShowerStore();
@@ -36,20 +37,7 @@ function onSceneReady(scene: Scene) {
 
   <div class="controls">
     <n-config-provider class="n-controls" :theme="darkTheme">
-      <n-tooltip placement="bottom" trigger="hover">
-        <template #trigger>
-          <n-button strong secondary round type="success" color="black">帮助</n-button>
-        </template>
-        <n-ul>
-          <n-li>1 - 白天</n-li>
-          <n-li>2 - 日落</n-li>
-          <n-li>3 - 黑夜</n-li>
-          <n-li>9 - 透明模式</n-li>
-          <n-li>0 - 不透明模式</n-li>
-          <n-li>双击楼体 - 进入单层模式</n-li>
-          <n-li>esc - 退至初始状态</n-li>
-        </n-ul>
-      </n-tooltip>
+      <Helper></Helper>
       <div id="monitor" v-if="IOTShower.show">
         <CarParks id="car-parks"></CarParks>
         <p></p>

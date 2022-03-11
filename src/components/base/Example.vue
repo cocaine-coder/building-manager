@@ -29,9 +29,9 @@ const value = ref(20);
         </n-card>
 
         <n-card title="多段线 MultilineRate">
-            <n-space>
+            <n-space :size="60">
                 <MultilineRate
-                    :width="400"
+                    :width="200"
                     :values="[
                         { color: '#455DDC', val: 40 },
                         { color: '#9646EF', val: 60 },
@@ -51,38 +51,37 @@ const value = ref(20);
         </n-card>
 
         <n-card title="多段线-圆环 MultilineCircleRate">
-            <MultilineCircleRate
-                :values="[
-                { color: '#43D1A7', val: 30 },
-                { color: '#43464C', val: 70 }]"
-                :size="100"
-                :empty="0.1"
-                :lineWidth="10"
-            ></MultilineCircleRate>
-            <span>&nbsp;</span>
-            <MultilineCircleRate
-                :values="[
-                { color: '#43D1A7', val: 40 },
-                { color: '#43464C', val: 60 }]"
-                :size="100"
-                :empty="0.1"
-                :lineWidth="10"
-                fontColor="#a162f7"
-                text="40%"
-            ></MultilineCircleRate>
-            <span>&nbsp;</span>
-            <MultilineCircleRate
-                :values="[
-                { color: '#455DDC', val: 40 },
-                { color: '#9646EF', val: 20 },
-                { color: '#FF852E', val: 15 },
-                { color: '#43D1A7', val: 20 },
-                { color: '#727C94', val: 5 }]"
-                :size="100"
-                :empty="0.1"
-                :lineWidth="10"
-            ></MultilineCircleRate>
-            <span>&nbsp;</span>
+            <n-space :size="60">
+                <MultilineCircleRate
+                    :values="[
+                    { color: '#43D1A7', val: 30 },
+                    { color: '#43464C', val: 70 }]"
+                    :size="100"
+                    :empty="0.1"
+                    :lineWidth="10"
+                ></MultilineCircleRate>
+                <MultilineCircleRate
+                    :values="[
+                    { color: '#43D1A7', val: 40 },
+                    { color: '#43464C', val: 60 }]"
+                    :size="100"
+                    :empty="0.1"
+                    :lineWidth="10"
+                    fontColor="#a162f7"
+                    text="40%"
+                ></MultilineCircleRate>
+                <MultilineCircleRate
+                    :values="[
+                    { color: '#455DDC', val: 40 },
+                    { color: '#9646EF', val: 20 },
+                    { color: '#FF852E', val: 15 },
+                    { color: '#43D1A7', val: 20 },
+                    { color: '#727C94', val: 5 }]"
+                    :size="100"
+                    :empty="0.1"
+                    :lineWidth="10"
+                ></MultilineCircleRate>
+            </n-space>
         </n-card>
 
         <n-card title="slider">
