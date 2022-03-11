@@ -24,6 +24,7 @@ export default class SimpleManager {
 
                 if (meshGroup.length < 2) {
                     this.parentMeshes.push(meshGroup[0]);
+                    this.scene.addMesh(meshGroup[0])
                     return;
                 }
 
