@@ -40,28 +40,23 @@ onMounted(() => {
             scene.render();
         });
 
-        const resize = () => {
-            scene.getEngine().resize();
-        };
-
         if (window) {
             window.addEventListener("resize", resize);
         }
-
-        return () => {
-            scene.getEngine().dispose();
-
-            if (window) {
-                window.removeEventListener("resize", resize);
-            }
-        };
     }
 })
 
 onUnmounted(() => {
-    scene?.dispose();
-    engine?.dispose();
+    scene.getEngine().dispose();
+
+    if (window) {
+        window.removeEventListener("resize", resize);
+    }
 })
+
+const resize = () => {
+    scene.getEngine().resize();
+};
 
 </script>
 

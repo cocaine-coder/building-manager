@@ -13,7 +13,7 @@ export default class SkyManager {
 
     private skyboxMaterial: SkyMaterial;
     private skybox: Mesh;
-    private envLight : Light;
+    private envLight: Light;
 
     constructor(private scene: Scene) {
         const skyboxMaterial = new SkyMaterial("skyMaterial", scene);
@@ -21,7 +21,8 @@ export default class SkyManager {
         skyboxMaterial.inclination = 0;        // 太阳倾角 [-0.5,0.5] 。 =0 时 太阳在正上方
         skyboxMaterial.turbidity = 0;          // 大气中的分子相对的雾度（散射）量
         skyboxMaterial.luminance = 1;          // 天空的整体亮度，区间为[0, 1] 
-        skyboxMaterial.cameraOffset.y = 150;   // 天空纵方向  越大天空越向下
+        skyboxMaterial.rayleigh = 1;
+        skyboxMaterial.cameraOffset.y = 100;   // 天空纵方向  越大天空越向下
         this.skyboxMaterial = skyboxMaterial;
 
         // 如果想直接设置太阳的位置
@@ -32,7 +33,7 @@ export default class SkyManager {
 
         this.skybox = Mesh.CreateBox("skyBox", 1000, scene);
         this.skybox.material = this.skyboxMaterial;
-        
+
         // 创建环境灯
         this.envLight = new HemisphericLight(NodeNameConfig.ENV_LIGHT_NAME, new Vector3(1, 1, 0), scene);
         this.envLight.intensity = 1;
@@ -50,7 +51,7 @@ export default class SkyManager {
                 this.setSkyConfig("material.inclination", this.skyboxMaterial.inclination, 0.49);
                 this.skyboxMaterial.turbidity = 5;
                 this.skyboxMaterial.cameraOffset.y = 0;
-                this.setEnvLightConfig(this.envLight.intensity, 0.1);
+                this.setEnvLightConfig(this.envLight.intensity, 0.2);
                 break;
             case "night":
                 this.setSkyConfig("material.inclination", this.skyboxMaterial.inclination, 0.5);
@@ -62,22 +63,22 @@ export default class SkyManager {
 
     private setSkyConfig(property: string, from: number, to: number) {
         var animation = new Animation("sky_animation", property, 100, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
-        animation.setKeys(this.getAnimationKeys(from,to));
+        animation.setKeys(this.getAnimationKeys(from, to));
 
         this.scene.stopAnimation(this.skybox);
         this.scene.beginDirectAnimation(this.skybox, [animation], 0, 100, false, 1);
     }
 
     private setEnvLightConfig(from: number, to: number) {
-        
+
         var animation = new Animation("env_light_animation", "intensity", 100, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
-        animation.setKeys(this.getAnimationKeys(from,to));
+        animation.setKeys(this.getAnimationKeys(from, to));
 
         this.scene.stopAnimation(this.envLight);
         this.scene.beginDirectAnimation(this.envLight, [animation], 0, 100, false, 1);
     }
 
-    private getAnimationKeys( from: number, to: number){
+    private getAnimationKeys(from: number, to: number) {
         return [
             { frame: 0, value: from },
             { frame: 100, value: to }

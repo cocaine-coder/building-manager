@@ -118,6 +118,9 @@ export default class SceneManager {
         this.camera.alpha = Math.PI / 2;
         this.camera.beta = Math.PI / 2.2;
         this.camera.radius = 100;
+        this.camera.target.x = 0;
+        this.camera.target.y = 0;
+        this.camera.target.z = -30;
     }
 
     goTo(mainMeshName:string){
@@ -134,9 +137,9 @@ export default class SceneManager {
     private createMainCamera(scene: Scene) {
         // 创建相机
         const camera = new ArcRotateCamera("camera", Math.PI / 2, Math.PI / 2.2, 100, new Vector3(0, 0, -30), scene);
-        camera.panningSensibility = 0; // 禁止平移
-        camera.lowerRadiusLimit = camera.radius * 0.5; // 最低缩放
-        camera.upperRadiusLimit = camera.radius * 1;   // 最大缩放
+        //camera.panningSensibility = 0; // 禁止平移
+        camera.lowerRadiusLimit = 0;//camera.radius * 0.5; // 最低缩放
+        //camera.upperRadiusLimit = camera.radius * 1;   // 最大缩放
         camera.lowerBetaLimit = 0;  // 最低纵轴旋转
         camera.upperBetaLimit = Math.PI / 2;  // 最高纵轴旋转
         camera.attachControl(scene.getEngine().getRenderingCanvas(), true);
