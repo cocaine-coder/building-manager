@@ -1,12 +1,12 @@
-import { AbstractMesh, Color3, Scene, SceneLoader, StandardMaterial, Vector3 } from "@babylonjs/core";
+import { AbstractMesh, ActionManager, Color3, ExecuteCodeAction, Mesh, MeshBuilder, Scene, SceneLoader, StandardMaterial, Vector3, VideoTexture } from "@babylonjs/core";
 
 import JASModel from '../../assets/model/infos/3f/JAS.glb?url'
 import JSOfficeModel from '../../assets/model/infos/3f/JSOffice.glb?url'
 import OtherModel from '../../assets/model/infos/3f/Other.glb?url'
 import SHCHModel from '../../assets/model/infos/3f/SHCH.glb?url'
 
-type MarkMeshType = "company" | "webcam" | "office";
-type ResourceType = "point" | "url"
+type MarkMeshType = "company" | "webcam" | "office" | "video";
+type ResourceType = "url" | "other"
 
 type MarkMesh = {
     name: string,
@@ -76,7 +76,6 @@ MarkMeshMap.set("4_primitive0_merged", new Map<MarkMeshType, Array<MarkMesh>>([
 export default class MarkMeshConfig {
 
     private static config: MarkMeshConfig | undefined;
-    public declare MarkMeshMap: Map<string, Map<MarkMeshType, Array<MarkMesh>>>;
 
     private constructor() {
     }
@@ -88,10 +87,16 @@ export default class MarkMeshConfig {
     }
 
     public init(scene: Scene) {
-        this.MarkMeshMap = this.buildMarkMeshConfig(scene);
+        this.buildMarkMeshConfig(scene);
     }
 
-    private buildMarkMeshConfig(scene: Scene): Map<string, Map<MarkMeshType, Array<MarkMesh>>> {
+    public get MarkMeshMap() {
+        return MarkMeshMap;
+    }
+
+    private buildMarkMeshConfig(scene: Scene) {
+
+        this.createVideoPlane("4_primitive0_merged", "http://localhost:8888/xcsp_min.mp4", scene, new Vector3(3.528, 9.05, -19.65), 1.45 * 1.920, 1.6 * 1.080);
 
         MarkMeshMap.forEach((meshArrayGroup, name) => {
             // 获取父节点
@@ -112,8 +117,6 @@ export default class MarkMeshConfig {
                 })
             })
         })
-
-        return MarkMeshMap;
     }
 
     private buildMesh(mark: MarkMesh, parent: AbstractMesh, scene: Scene) {
@@ -136,6 +139,59 @@ export default class MarkMeshConfig {
 
         parent.addChild(mesh);
         scene.addMesh(mesh);
+    }
+
+    private createVideoPlane(parentName: string, url: string, scene: Scene, position: Vector3, width: number, height: number) {
+        // 获取父节点
+        const parentMesh = scene.getMeshByName(parentName);
+        if (parentMesh === null) throw Error("mark mesh : get parent-mesh error!");
+
+        const videoPlane = MeshBuilder.CreatePlane('video', {
+            width: width,
+            height: height,
+            sideOrientation: Mesh.DOUBLESIDE
+        }, scene);
+        videoPlane.parent = parentMesh;
+        videoPlane.position = position;
+        videoPlane.rotate(new Vector3(0, 1, 0), Math.PI);
+        const videoMat = new StandardMaterial(url, scene);
+        const videoTex = new VideoTexture(null, url, scene, undefined, undefined, undefined, {
+            autoPlay: true,
+            autoUpdateTexture: true
+        });
+        videoMat.diffuseTexture = videoTex;
+        videoMat.roughness = 1;
+        videoMat.emissiveColor = Color3.White();
+        videoPlane.material = videoMat;
+
+        videoPlane.actionManager = new ActionManager(scene);
+        videoPlane.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, evt => {
+            if (videoTex.video.paused)
+                videoTex.video.play();
+            else
+                videoTex.video.pause();
+        }))
+
+        let meshArrayGroup = this.MarkMeshMap.get(parentName);
+        if (!meshArrayGroup) {
+            meshArrayGroup = new Map<MarkMeshType, Array<MarkMesh>>();
+            this.MarkMeshMap.set(parentName, meshArrayGroup);
+        }
+
+        let videoMeshes = meshArrayGroup.get('video');
+        if (!videoMeshes) {
+            videoMeshes = new Array<MarkMesh>();
+            meshArrayGroup.set('video', videoMeshes);
+        }
+
+        videoMeshes.push({
+            name: "山湖测绘有限公司",
+            message: "山湖测绘有限公司",
+            resourceType: "other",
+            mesh: videoPlane
+        });
+
+        videoPlane.setEnabled(false);
     }
 }
 

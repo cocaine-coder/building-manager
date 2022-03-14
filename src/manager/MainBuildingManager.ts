@@ -1,4 +1,4 @@
-import { AbstractMesh, ActionManager, Color3, ExecuteCodeAction, InterpolateValueAction, Material, Mesh, Scene, StandardMaterial, Vector3 } from "@babylonjs/core";
+import { AbstractMesh, ActionManager, Color3, ExecuteCodeAction, InterpolateValueAction, Material, Mesh, MeshBuilder, Scene, StandardMaterial, Vector3, VideoTexture } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Control, Rectangle, TextBlock } from '@babylonjs/gui';
 
 import SimpleManager from "./SimpleManager";
@@ -63,7 +63,7 @@ export default class extends SimpleManager {
         if (this.currentFloorMesh) {
             this.registAction4YKDSMesh(this.currentFloorMesh);
             this.sceneManager.setEnable(true);
-            this.currentFloorMesh.getChildMeshes().forEach(mesh => mesh.isVisible = false);
+            this.clearChildrenMesh(this.currentFloorMesh);
             this.currentFloorMesh = undefined;
 
             if (this.currentControl)
@@ -82,7 +82,7 @@ export default class extends SimpleManager {
         this.floorStore.meshName = gotoMesh.name;
         if (this.currentFloorMesh) {
             this.registAction4YKDSMesh(this.currentFloorMesh);
-            this.currentFloorMesh?.getChildMeshes().forEach(mesh => mesh.isVisible = false);
+            this.clearChildrenMesh(this.currentFloorMesh);
         }
 
         this.currentFloorMesh = gotoMesh;
@@ -95,7 +95,7 @@ export default class extends SimpleManager {
         }
         gotoMesh.actionManager?.dispose();
 
-        this.showCurrentFloorMarkMeshes(gotoMesh.name, ["company"]);
+        this.showCurrentFloorMarkMeshes(gotoMesh.name, ["company","video"]);
 
         // 设置只显示主楼
         this.sceneManager.setEnable(false, 'mainbuilding');
@@ -163,6 +163,16 @@ export default class extends SimpleManager {
                 }
             });
         })
+    }
+
+    private clearChildrenMesh(mesh:AbstractMesh){
+        mesh.getChildMeshes().forEach(mesh=>{
+            mesh.setEnabled(false);
+            const mat = mesh.material as StandardMaterial;
+            if(mat.diffuseTexture instanceof VideoTexture){
+                mat.diffuseTexture.video.pause();
+            }
+        });
     }
 
     private registAction4YKDSMesh(mesh: AbstractMesh) {

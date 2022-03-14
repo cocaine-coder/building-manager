@@ -1,4 +1,4 @@
-import { ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core";
+import { ActionManager, ArcRotateCamera, Color3, ExecuteCodeAction, Mesh, MeshBuilder, PointerEventTypes, Scene, StandardMaterial, Vector3, VideoTexture } from "@babylonjs/core";
 import SkyManager from "./SkyManager";
 import SimpleManager from "./SimpleManager";
 import StreetLightManager from "./StreetLightManager";
@@ -112,7 +112,7 @@ export default class SceneManager {
         })
     }
 
-    goOrigin(){
+    goOrigin() {
         this.mainbuilding.goBack();
 
         this.camera.alpha = Math.PI / 2;
@@ -123,7 +123,7 @@ export default class SceneManager {
         this.camera.target.z = -30;
     }
 
-    goTo(mainMeshName:string){
+    goTo(mainMeshName: string) {
         this.mainbuilding.goTo(mainMeshName);
     }
 
