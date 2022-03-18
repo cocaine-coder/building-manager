@@ -12,7 +12,7 @@ export type SkyState = "day" | "sunset" | "night"
 export default class SkyManager {
 
     private skyboxMaterial: SkyMaterial;
-    private skybox: Mesh;
+    public skybox: Mesh;
     private envLight: Light;
 
     constructor(private scene: Scene) {

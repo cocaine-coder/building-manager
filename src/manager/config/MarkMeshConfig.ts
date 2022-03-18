@@ -156,7 +156,7 @@ export default class MarkMeshConfig {
         videoPlane.rotate(new Vector3(0, 1, 0), Math.PI);
         const videoMat = new StandardMaterial(url, scene);
         const videoTex = new VideoTexture(null, url, scene, undefined, undefined, undefined, {
-            autoPlay: true,
+            autoPlay: false,
             autoUpdateTexture: true
         });
         videoMat.diffuseTexture = videoTex;

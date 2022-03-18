@@ -109,6 +109,7 @@ export default class extends SimpleManager {
             this.advancedTexture.removeControl(this.currentControl);
 
         this.iotShowerStore.show = false;
+        this.sceneManager.camera.zoomOn([gotoMesh],true);
     }
 
     getCurrentFloorMarkMesheTypes(name: string): IterableIterator<MarkMeshType> | undefined {

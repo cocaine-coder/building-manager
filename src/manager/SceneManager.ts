@@ -16,8 +16,8 @@ export default class SceneManager {
 
     private static _instance: SceneManager;
     private declare scene: Scene;
-    private declare camera: ArcRotateCamera;
-    private declare sky: SkyManager;
+    public declare camera: ArcRotateCamera;
+    public declare sky: SkyManager;
 
     private declare ground: SimpleManager;
     private declare downspout: SimpleManager;
@@ -146,6 +146,9 @@ export default class SceneManager {
         //camera.upperRadiusLimit = camera.radius * 1;   // 最大缩放
         camera.lowerBetaLimit = 0;  // 最低纵轴旋转
         camera.upperBetaLimit = Math.PI / 2;  // 最高纵轴旋转
+        
+        camera.panningSensibility = 200; // 控制平移阻尼 越大平移速度越慢
+        camera.wheelDeltaPercentage = 0.005; // 控制滚轮增量
         camera.attachControl(scene.getEngine().getRenderingCanvas(), true);
 
         this.camera = camera;
