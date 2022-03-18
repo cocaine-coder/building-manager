@@ -1,4 +1,4 @@
-import { ActionManager, ArcRotateCamera, Color3, ExecuteCodeAction, Mesh, MeshBuilder, PointerEventTypes, Scene, StandardMaterial, Vector3, VideoTexture } from "@babylonjs/core";
+import { ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core";
 import SkyManager from "./SkyManager";
 import SimpleManager from "./SimpleManager";
 import StreetLightManager from "./StreetLightManager";
@@ -39,32 +39,34 @@ export default class SceneManager {
         return this._instance;
     }
 
-    async init(scene: Scene) {
+    init(scene: Scene) {
         this.scene = scene;
         this.managerMap = new Map<ManagerType, SimpleManager>();
         this.createMainCamera(scene);   // 创建相机
         this.sky = new SkyManager(scene);   // 创建天空
 
+        const tasks = new Array<Promise<void>>();
+
         this.ground = new SimpleManager(scene, groundUrl);
-        await this.ground.loadAsync();
+        tasks.push(this.ground.loadAsync());
 
         this.guard = new SimpleManager(scene, guardUrl);
-        await this.guard.loadAsync();
+        tasks.push(this.guard.loadAsync());
 
         this.manholecover = new SimpleManager(scene, manholecoverUrl);
-        await this.manholecover.loadAsync();
+        tasks.push(this.manholecover.loadAsync());
 
         this.parkline = new SimpleManager(scene, parklineUrl);
-        await this.parkline.loadAsync();
+        tasks.push(this.parkline.loadAsync());
 
         this.downspout = new SimpleManager(scene, downspoutUrl)
-        await this.downspout.loadAsync();
+        tasks.push(this.downspout.loadAsync());
 
         this.light = new StreetLightManager(scene);
-        await this.light.loadAsync();
+        tasks.push(this.light.loadAsync());
 
         this.mainbuilding = new MainBuildingManager(scene, this);
-        await this.mainbuilding.loadAsync();
+        tasks.push(this.mainbuilding.loadAsync());
 
         this.addWindowKeyboardEvent();  // 添加键盘事件
 
@@ -75,6 +77,8 @@ export default class SceneManager {
         this.managerMap.set('downspout', this.downspout);
         this.managerMap.set('light', this.light);
         this.managerMap.set('mainbuilding', this.mainbuilding);
+
+        return Promise.all(tasks);
     }
 
     setEnable(value: boolean, ...excepts: ManagerType[]) {
