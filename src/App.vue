@@ -34,8 +34,8 @@ function onSceneReady(scene: Scene) {
     class="scene-container"
     :onSceneReady="onSceneReady"
     :onRender="undefined"
-    antialias
-    adaptToDeviceRatio
+    :antialias = "true"
+    :adaptToDeviceRatio = "true"
   ></SceneComponent>
 
     <n-config-provider class="n-controls" :theme="darkTheme">

@@ -35,8 +35,8 @@ export default class SkyManager {
         this.skybox.material = this.skyboxMaterial;
 
         // 创建环境灯
-        this.envLight = new HemisphericLight(NodeNameConfig.ENV_LIGHT_NAME, new Vector3(1, 1, 0), scene);
-        this.envLight.intensity = 1;
+        this.envLight = new HemisphericLight(NodeNameConfig.ENV_LIGHT_NAME, new Vector3(-1, 1, 1), scene);
+        this.envLight.intensity = 1.2;
     }
 
     change(state: SkyState) {

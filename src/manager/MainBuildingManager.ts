@@ -1,4 +1,4 @@
-import { AbstractMesh, ActionManager, Color3, ExecuteCodeAction, InterpolateValueAction, Material, Mesh, MeshBuilder, Scene, StandardMaterial, Vector3, VideoTexture } from "@babylonjs/core";
+import { AbstractMesh, ActionManager, Color3, ExecuteCodeAction, InterpolateValueAction, Material, Mesh, MeshBuilder, MultiMaterial, Scene, StandardMaterial, Vector3, VideoTexture } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Control, Rectangle, TextBlock } from '@babylonjs/gui';
 
 import SimpleManager from "./SimpleManager";
@@ -27,6 +27,13 @@ export default class extends SimpleManager {
             this.parentMeshes.forEach(mesh => {
                 if (mesh.material) {
                     this.originMaterials.set(mesh.name, mesh.material);
+                    
+                    if(mesh.material instanceof MultiMaterial){
+                        mesh.material.subMaterials.forEach(material=>{
+                            material!.alphaMode = 4;
+                        })
+                    }
+
                     if (mesh.name !== "9_primitive0_merged")
                         this.registAction4YKDSMesh(mesh);
                 }
