@@ -20,7 +20,7 @@ const loading = useLoadingStore();
 const IOTShower = useIOTShowerStore();
 
 function onSceneReady(scene: Scene) {
-  SceneManager.Instance.init(scene).then(() => {
+  SceneManager.Instance.initAsync(scene).then(() => {
     loading.show = false;
   });
 }
