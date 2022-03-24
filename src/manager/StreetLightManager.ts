@@ -1,12 +1,10 @@
 import { Color3, Mesh, Scene, SpotLight, Vector3 } from "@babylonjs/core";
 import NodeNameConfig from "./config/NodeNameConfig";
-import SimpleManager from "./SimpleManager";
 
 import lightUrl from '../assets/model/env/light.glb?url';
 
-export default class extends SimpleManager {
+default class {
     constructor(scene: Scene) {
-        super(scene, lightUrl, false);
 
         this.onLoaded = () => {
 
@@ -39,7 +37,7 @@ export default class extends SimpleManager {
     }
 
     setEnabled(value: boolean): void {
-        super.setEnabled(value);
+        setEnabled(value);
     }
 
     setLightEnable(value: boolean) {

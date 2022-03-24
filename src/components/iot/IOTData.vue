@@ -24,7 +24,7 @@ const airQualityCheck: CheckFCType = (value: number) => {
 const datas = reactive<Array<IOTDataType>>([
     { name: "温度", value: 20, icon: "temperature", unit: "℃", check: temperatureCheck },
     { name: "湿度", value: 55, icon: "humidity", unit: "％", check: humidityCheck },
-    { name: '空气质量', value: 20, icon: "airQuality", check: airQualityCheck }
+    { name: '空气质量', value: 20, icon: "airQuality", check: airQualityCheck },
 ])
 
 let intervalHandler: number | undefined;
