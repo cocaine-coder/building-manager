@@ -1,19 +1,24 @@
-import { ArcRotateCamera, Mesh, Scene, SceneLoader, Vector3 } from "@babylonjs/core";
+import { AbstractMesh, Action, ActionManager, ArcRotateCamera, Color4, ExecuteCodeAction, GlowLayer, InstancedMesh, Mesh, MeshBuilder, Scene, SceneLoader, Sprite, SpriteManager, Vector3 } from "@babylonjs/core";
 import SkyManager from "./SkyManager";
 
 import MainBuildingManager from "./MainBuildingManager";
 import model from '../assets/model/all.glb?url';
+import carModel from '../assets/model/car.glb?url';
+import pointUrl from '../assets/imgs/point.png?url';
+
 import { groupby } from "../utils/ArrayExtension";
+import { createConeMarker, createSimpleBillboard } from "../utils/BJSExtension";
+import { Control } from "@babylonjs/gui";
 
 type ManagerType = "ground" | "downspout" | "guard" | "manholecover" | "parkline" | "light" | "mainbuilding"
 
 export default class SceneManager {
-
     private static _instance: SceneManager;
     private declare scene: Scene;
 
     public declare camera: ArcRotateCamera;
     public declare sky: SkyManager;
+    public declare mainBuildingManager: MainBuildingManager;
 
     private constructor() {
     }
@@ -44,20 +49,43 @@ export default class SceneManager {
         this.sky = new SkyManager(scene);
 
         const container = await SceneLoader.LoadAssetContainerAsync(model, undefined, scene);
-        const meshGroup = groupby(container.meshes, mesh =>mesh.parent?.name, mesh => mesh as Mesh);
-        meshGroup.forEach((meshes, key) => {
-            console.log(key, meshes.map(x=>x.name).join(","))
-            if (meshes.length === 1 || !key || key === "Group018") {
-                meshes.forEach(mesh => this.scene.addMesh(mesh));
-                return;
+        //container.addAllToScene()
+        const meshGroup = groupby(container.meshes, mesh => {
+            if (mesh.name.indexOf("primitive") !== -1) {
+                return mesh.name.split('_')[0];
             }
+            return undefined;
+        });
 
-            const merged = Mesh.MergeMeshes(meshes, true, true, undefined, false, true);
-            merged!.name = key;
+        meshGroup.forEach((meshes, key) => {
+            if (meshes.length === 1 || !key) {
+                meshes.forEach(mesh => this.scene.addMesh(mesh));
+            }
+            else {
+                const merged = Mesh.MergeMeshes(meshes.map(mesh => mesh as Mesh), true, true, undefined, false, true);
+                if (merged) merged.name = key;
+            }
         })
 
-        new MainBuildingManager(scene);
+        // 加载车辆资源
+        const carContainer = await SceneLoader.LoadAssetContainerAsync(carModel, undefined, scene);
+        carContainer.addAllToScene();
 
+        var gl = new GlowLayer("glow", scene, {
+            mainTextureFixedSize: 1024,
+            blurKernelSize: 64
+        });
+        gl.intensity = 1;
+
+        const spriteManagerTrees = new SpriteManager("treesManager", pointUrl, 2000, { width: 512, height: 1024 }, scene);
+        const tree = new Sprite("tree", spriteManagerTrees);
+
+        tree.width = 4;
+        tree.height = 5;
+
+        createSimpleBillboard("悉地集团有限公司", scene.getMeshByName("other8")!);
+
+        this.mainBuildingManager = new MainBuildingManager(scene);
         this.addWindowKeyboardEvent();
     }
 
@@ -70,7 +98,7 @@ export default class SceneManager {
     private addWindowKeyboardEvent() {
         window.addEventListener('keydown', e => {
             switch (e.key) {
-
+                case 'Escape': this.mainBuildingManager.leave(); break;
             }
         })
     }
@@ -87,7 +115,7 @@ export default class SceneManager {
         const camera = new ArcRotateCamera("camera", Math.PI / 2, Math.PI / 2.2, 100, new Vector3(0, 0, -30), scene);
         //camera.panningSensibility = 0; // 禁止平移
         camera.lowerRadiusLimit = 0;//camera.radius * 0.5; // 最低缩放
-        //camera.upperRadiusLimit = camera.radius * 1;   // 最大缩放
+        camera.upperRadiusLimit = camera.radius * 3;   // 最大缩放
         camera.lowerBetaLimit = 0;  // 最低纵轴旋转
         camera.upperBetaLimit = Math.PI / 2;  // 最高纵轴旋转
 

@@ -1,5 +1,6 @@
-import { AbstractMesh, ActionManager, ArcRotateCamera, Color3, ExecuteCodeAction, InterpolateValueAction, Material, Mesh, MeshBuilder, MultiMaterial, Scene, SetValueAction, StandardMaterial, Vector3, VideoTexture } from "@babylonjs/core";
+import { AbstractMesh, ActionEvent, ActionManager, ArcRotateCamera, Color3, ExecuteCodeAction, InterpolateValueAction, Material, Mesh, MeshBuilder, MultiMaterial, Scene, SetValueAction, StandardMaterial, Vector3, VideoTexture } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Control, Rectangle, TextBlock } from '@babylonjs/gui';
+import NodeNameConfig from "./config/NodeNameConfig";
 
 export type FloorChildType = "item" | "webcam" | "furniture";
 
@@ -9,32 +10,34 @@ interface FloorChild {
     mesh?: AbstractMesh
 }
 
+let currentFloor: Floor | undefined;
+
 const FloorMaps = new Map<string, Map<FloorChildType, Array<FloorChild>>>([
+    ["1", new Map<FloorChildType, Array<FloorChild>>()],
     ["2", new Map<FloorChildType, Array<FloorChild>>()],
-    ["3", new Map<FloorChildType, Array<FloorChild>>()],
-    ["4", new Map<FloorChildType, Array<FloorChild>>([
+    ["3", new Map<FloorChildType, Array<FloorChild>>([
         ["item", [
-            { name: "4-1", message: "" },
-            { name: "4-2", message: "" },
-            { name: "4-3", message: "" },
-            { name: "4-4", message: "" },
-            { name: "4-5", message: "" },
-            { name: "4-6", message: "" },
-            { name: "4-7", message: "" },
-            { name: "4-8", message: "" },
-            { name: "4-9", message: "" },
-            { name: "4-10", message: "" },
-            { name: "4-11", message: "" },
-            { name: "4-12", message: "" },
-            { name: "4-13", message: "" },
+            { name: "3-1", message: "" },
+            { name: "3-2", message: "" },
+            { name: "3-3", message: "" },
+            { name: "3-4", message: "" },
+            { name: "3-5", message: "" },
+            { name: "3-6", message: "" },
+            { name: "3-7", message: "" },
+            { name: "3-8", message: "" },
+            { name: "3-9", message: "" },
+            { name: "3-10", message: "" },
+            { name: "3-11", message: "" },
+            { name: "3-12", message: "" },
+            { name: "3-13", message: "" },
         ]],
         ["furniture", [
-            { name: "Jiaju", message: "" },
+            { name: "3-JiaJu", message: "" },
         ]]
     ])],
+    ["4", new Map<FloorChildType, Array<FloorChild>>()],
     ["5", new Map<FloorChildType, Array<FloorChild>>()],
     ["6", new Map<FloorChildType, Array<FloorChild>>()],
-    ["7", new Map<FloorChildType, Array<FloorChild>>()],
 ])
 
 
@@ -46,47 +49,31 @@ class Floor {
     /**
      *
      */
-    constructor(private scene: Scene, private readonly name: string) {
+    constructor(private scene: Scene, public readonly name: string) {
         this.mesh = this.scene.getMeshByName(this.name)!;
         this.mesh.overlayColor = Color3.FromHexString("#000000");
-        this.mesh.actionManager = new ActionManager(scene);
 
         const floorMap = FloorMaps.get(this.name)!;
         floorMap.forEach((children) => {
             children.forEach(child => {
                 child.mesh = scene.getMeshByName(child.name)!;
                 child.mesh.overlayColor = Color3.FromHexString("#000000");
-                //child.mesh.parent = this.mesh;
             })
         })
         this.children = floorMap;
 
-        this.registMeshAction(this.mesh);
+        this.initActions();
     }
 
-    get displayName() {
-        return Number.parseInt(this.name) - 1 + "F";
-    }
-
-    get meshes(){
+    get meshes() {
         const ret = [this.mesh];
-        this.children.forEach(child=>{
-            child.forEach(mesh=>    {
+        this.children.forEach(child => {
+            child.forEach(mesh => {
                 ret.push(mesh.mesh!);
             })
         })
 
         return ret;
-    }
-
-    /**
-     * 设置单层是否可用，影响floor中所有mesh
-     *
-     * @param {boolean} value
-     * @memberof Floor
-     */
-    setEnable(value: boolean) {
-        this.mesh.setEnabled(value);
     }
 
     /**
@@ -113,35 +100,82 @@ class Floor {
         })
     }
 
-    private registMeshAction(mesh:AbstractMesh) {
-        mesh.actionManager!.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOverTrigger,e=>{
-            mesh.renderOverlay  = true;
-            this.children.get('item')?.forEach(item=>{
-                item.mesh!.renderOverlay = true;
-            })
-        }));
-        mesh.actionManager!.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOutTrigger,e=>{
-            mesh.renderOverlay  = false;
-            this.children.get('item')?.forEach(item=>{
-                item.mesh!.renderOverlay = false;
-            })
-        }));
+    enter() {
+        // 设置显示隐藏 显示天空及当前floor的mesh
+        this.scene.meshes.forEach(mesh => {
+            mesh.isVisible = mesh.name === NodeNameConfig.SKY_BOX_NAME ||
+                this.meshes.find(m => m.name === mesh.name) !== undefined;
+        })
 
-        mesh.actionManager!.registerAction(new ExecuteCodeAction(ActionManager.OnDoublePickTrigger,e=>{
-           this.scene.meshes.forEach(mesh=>{
-               if(mesh.name !== 'skyBox' && this.meshes.every(x=>x.name !== mesh.name)){
-                    mesh.isVisible = false;
-               }
-           })
-        }));
+        // 当前floor meshes 还原状态，删除action
+        this.meshes.forEach(mesh => {
+            mesh.actionManager!.actions
+                .forEach(action => mesh.actionManager?.unregisterAction(action));
+            mesh.renderOverlay = false;
+
+            if (mesh === this.mesh) return;
+
+            mesh.actionManager!.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, e => {
+                mesh.renderOverlay = true;
+            }));
+            mesh.actionManager!.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, e => {
+                mesh.renderOverlay = false;
+            }));
+        });
+    }
+
+    leave() {
+        this.initActions();
+    }
+
+    private initActions() {
+        this.meshes.forEach(mesh => {
+            if (mesh.actionManager)
+                mesh.actionManager.dispose();
+            mesh.actionManager = new ActionManager(this.scene);
+
+            mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, e => {
+                this.meshes.forEach(mesh => mesh.renderOverlay = true);
+            }));
+            mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, e => {
+                this.meshes.forEach(mesh => mesh.renderOverlay = false);
+            }));
+            mesh.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnDoublePickTrigger, e => {
+                currentFloor = this;
+                this.enter();
+            }));
+        })
     }
 }
 
 export default class {
+    private _floorNames: Array<string> | undefined;
     private floors = new Array<Floor>();
+
     constructor(private scene: Scene) {
-        FloorMaps.forEach((value, key) => {
+        FloorMaps.forEach((_, key) => {
             this.floors.push(new Floor(scene, key));
         })
+    }
+
+    get floorNames() {
+        if (!this._floorNames)
+            this._floorNames = this.floors.map(f => f.name);
+        return this._floorNames;
+    }
+
+    enter(floorName: string) {
+        const floor = this.floors.find(f => f.name === floorName);
+        if (!floor) throw Error(`floor : ${floorName} is not existed !`);
+
+        currentFloor?.leave();
+        currentFloor = floor;
+        currentFloor.enter();
+    }
+
+    leave() {
+        currentFloor?.leave();
+        currentFloor = undefined;
+        this.scene.meshes.forEach(mesh => mesh.isVisible = true);
     }
 }

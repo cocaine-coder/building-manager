@@ -3,6 +3,7 @@ import {Readonly} from '../../utils/ReadOnly'
 class NodeNameConfig {
     ENV_LIGHT_NAME = "";
     STREET_LIGHT_NAME = "";
+    SKY_BOX_NAME = "";
 }
 
 const value: NodeNameConfig = new NodeNameConfig();

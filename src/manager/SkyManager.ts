@@ -27,11 +27,9 @@ export default class SkyManager {
 
         // 如果想直接设置太阳的位置
         // this.skyboxMaterial.useSunPosition = true; 
-        // this.skyboxMaterial.sunPosition = new Vector3(0, 100, 0);
+        // this.skyboxMaterial.sunPosition = new Vector3(0, 100, 0);        // 具体参数 ：https://doc.babylonjs.com/toolsAndResources/assetLibraries/materialsLibrary/skyMat
 
-        // 具体参数 ：https://doc.babylonjs.com/toolsAndResources/assetLibraries/materialsLibrary/skyMat
-
-        this.skybox = Mesh.CreateBox("skyBox", 1000, scene);
+        this.skybox = Mesh.CreateBox(NodeNameConfig.SKY_BOX_NAME, 1000, scene);
         this.skybox.material = this.skyboxMaterial;
 
         // 创建环境灯

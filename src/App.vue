@@ -38,7 +38,7 @@ function onSceneReady(scene: Scene) {
     :adaptToDeviceRatio = "true"
   ></SceneComponent>
 
-    <n-config-provider class="n-controls" :theme="darkTheme">
+    <!-- <n-config-provider class="n-controls" :theme="darkTheme">
       <Helper></Helper>
       <div id="monitor" v-if="IOTShower.show">
         <CarParks id="car-parks"></CarParks>
@@ -47,7 +47,7 @@ function onSceneReady(scene: Scene) {
       </div>
 
       <Floors id="floors"></Floors>
-    </n-config-provider>
+    </n-config-provider> -->
 </template>
 
 <style>
