@@ -7,6 +7,7 @@
     "strict": true,
     "types": ["naive-ui/volar"],
     "jsx": "preserve",
+    "allowJs": true,
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,

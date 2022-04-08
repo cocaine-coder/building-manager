@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { ref, computed, onMounted } from 'vue';
 
 const props = defineProps<{
@@ -7,6 +6,8 @@ const props = defineProps<{
     prefix?: string
     id?: string,
     size?: number,
+    height?: string | number,
+    width?: string | number,
     color?: string,
     onLoaded?: (svg: SVGSVGElement) => void,
 }>();
@@ -18,12 +19,26 @@ const svg = ref<SVGSVGElement>();
 const width = computed(() => {
     if (!svg.value) return undefined;
     const size = props.size || 1;
+    if(props.width){
+        if(typeof props.width === 'number')
+            return size * props.width;
+        else 
+            return props.width;
+    }
+
     return (svg.value.clientWidth - 150) * size;
 })
 
 const height = computed(() => {
     if (!svg.value) return undefined;
     const size = props.size || 1;
+     if(props.height){
+        if(typeof props.height === 'number')
+            return size * props.height;
+        else 
+            return props.width;
+    }
+
     return svg.value.clientHeight * size;
 })
 

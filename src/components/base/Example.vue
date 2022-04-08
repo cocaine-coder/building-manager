@@ -5,6 +5,7 @@ import SvgIcon from './SvgIcon.vue';
 import CircleSlider from './shape/CircleSlider.vue';
 import MultilineCircleRate from './shape/MultilineCircleRate.vue';
 import MultilineRate from './shape/MultilineRate.vue';
+import Webcam from '../Webcam.vue';
 
 const value = ref(20);
 
@@ -92,6 +93,10 @@ const value = ref(20);
                 <div id="end"></div>
             </n-space>
         </n-card>
+
+        <Webcam url="ezopen://open.ys7.com/G85698102/1.hd.live"
+            accessToken="at.166geqpd529zqwbwarzo1e7647cz4r8r-2kqw0011qw-00yo348-zbagkud6b"
+        ></Webcam>
     </div>
 </template>
 

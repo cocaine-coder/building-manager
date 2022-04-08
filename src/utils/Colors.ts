@@ -18,7 +18,7 @@ export function getColors(num: number, ...excepts: string[]) {
         }
 
         // 出现重复
-        else if(excepts.indexOf(color) !== -1){
+        else if (excepts.indexOf(color) !== -1) {
             i--;
             continue;
         }
@@ -27,4 +27,19 @@ export function getColors(num: number, ...excepts: string[]) {
     }
 
     return ret;
+}
+
+
+export function hex2rgb(hex: string) {
+    try {
+        hex = hex.replaceAll('#', '');
+        const r = Number.parseInt(hex.substring(0, 2));
+        const g = Number.parseInt(hex.substring(2, 4));
+        const b = Number.parseInt(hex.substring(4, 6));
+
+        return { r, g, b };
+    } catch (ex) {
+        console.error(`hex : ${hex} to rgb failt`);
+        return { r: 0, g: 0, b: 0 };
+    }
 }

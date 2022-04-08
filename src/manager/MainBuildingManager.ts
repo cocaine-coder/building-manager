@@ -1,6 +1,5 @@
-import { AbstractMesh, ActionEvent, ActionManager, ArcRotateCamera, Color3, ExecuteCodeAction, InterpolateValueAction, Material, Mesh, MeshBuilder, MultiMaterial, Scene, SetValueAction, StandardMaterial, Vector3, VideoTexture } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Control, Rectangle, TextBlock } from '@babylonjs/gui';
-import NodeNameConfig from "./config/NodeNameConfig";
+import { AbstractMesh, ActionManager, Color3, ExecuteCodeAction, Scene } from "@babylonjs/core";
+import NodeNameConfig from "../config/NodeNameConfig";
 
 export type FloorChildType = "item" | "webcam" | "furniture";
 

@@ -1,6 +1,6 @@
 import { Scene, Mesh, Animation, Light, HemisphericLight, Vector3, Color3 } from "@babylonjs/core";
 import { SkyMaterial } from "@babylonjs/materials";
-import NodeNameConfig from "./config/NodeNameConfig";
+import NodeNameConfig from "../config/NodeNameConfig";
 
 export type SkyState = "day" | "sunset" | "night"
 

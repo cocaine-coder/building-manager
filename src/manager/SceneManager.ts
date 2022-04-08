@@ -1,21 +1,25 @@
-import { AbstractMesh, Action, ActionManager, ArcRotateCamera, Color4, ExecuteCodeAction, GlowLayer, InstancedMesh, Mesh, MeshBuilder, Scene, SceneLoader, Sprite, SpriteManager, Vector3 } from "@babylonjs/core";
-import SkyManager from "./SkyManager";
+import {  Animation, Animatable, ArcRotateCamera,CubicEase, GlowLayer, Mesh, Scene, SceneLoader, Vector3, EasingFunction, MeshBuilder } from "@babylonjs/core";
 
+import SkyManager from "./SkyManager";
 import MainBuildingManager from "./MainBuildingManager";
-import model from '../assets/model/all.glb?url';
+
 import carModel from '../assets/model/car.glb?url';
-import pointUrl from '../assets/imgs/point.png?url';
+import groundModel from '../assets/model/ground.glb?url';
+import mainModel from '../assets/model/main.glb?url';
+import otherModel from '../assets/model/other.glb?url';
+import treeModel from '../assets/model/tree.glb?url';
+import undergroundModel from '../assets/model/underground.glb?url';
 
 import { groupby } from "../utils/ArrayExtension";
-import { createConeMarker, createSimpleBillboard } from "../utils/BJSExtension";
-import { Control } from "@babylonjs/gui";
-
-type ManagerType = "ground" | "downspout" | "guard" | "manholecover" | "parkline" | "light" | "mainbuilding"
 
 export default class SceneManager {
     private static _instance: SceneManager;
-    private declare scene: Scene;
 
+    private declare cameraOrgPosition: Vector3;
+    private declare cameraOrgTarget: Vector3;
+    private cameraAnimatables = new Array<Animatable>();
+
+    public declare scene: Scene;
     public declare camera: ArcRotateCamera;
     public declare sky: SkyManager;
     public declare mainBuildingManager: MainBuildingManager;
@@ -48,45 +52,40 @@ export default class SceneManager {
         this.createMainCamera(scene);
         this.sky = new SkyManager(scene);
 
-        const container = await SceneLoader.LoadAssetContainerAsync(model, undefined, scene);
-        //container.addAllToScene()
-        const meshGroup = groupby(container.meshes, mesh => {
-            if (mesh.name.indexOf("primitive") !== -1) {
-                return mesh.name.split('_')[0];
-            }
-            return undefined;
-        });
-
-        meshGroup.forEach((meshes, key) => {
-            if (meshes.length === 1 || !key) {
-                meshes.forEach(mesh => this.scene.addMesh(mesh));
-            }
-            else {
-                const merged = Mesh.MergeMeshes(meshes.map(mesh => mesh as Mesh), true, true, undefined, false, true);
-                if (merged) merged.name = key;
-            }
-        })
+        await Promise.all([groundModel,mainModel,otherModel,treeModel,undergroundModel].map(model=>{
+            return this.loadAndMergerMeshAsync(model);
+        }));
 
         // 加载车辆资源
         const carContainer = await SceneLoader.LoadAssetContainerAsync(carModel, undefined, scene);
         carContainer.addAllToScene();
 
+        // 发光物高亮
         var gl = new GlowLayer("glow", scene, {
             mainTextureFixedSize: 1024,
             blurKernelSize: 64
         });
         gl.intensity = 1;
 
-        const spriteManagerTrees = new SpriteManager("treesManager", pointUrl, 2000, { width: 512, height: 1024 }, scene);
-        const tree = new Sprite("tree", spriteManagerTrees);
-
-        tree.width = 4;
-        tree.height = 5;
-
-        createSimpleBillboard("悉地集团有限公司", scene.getMeshByName("other8")!);
-
         this.mainBuildingManager = new MainBuildingManager(scene);
         this.addWindowKeyboardEvent();
+    }
+
+    /**
+     * 相机飞入动画
+     * @param property  改变的属性 位置和朝向 
+     * @param to 终点值
+     * @param onAnimationEnd 动画结束事件
+     */
+    flyto(property: "position" | "target", to: Vector3, onAnimationEnd?: (() => void)) {
+        const ease = new CubicEase();
+        ease.setEasingMode(EasingFunction.EASINGMODE_EASEINOUT);
+        this.cameraAnimatables.forEach(animatable => animatable.stop());
+
+        const from = property === 'position' ? this.camera.position : this.camera.target;
+        const animatable = Animation.CreateAndStartAnimation("flyto", this.camera, property, 60, 120, from, to, 0, ease, onAnimationEnd);
+        if (animatable)
+            this.cameraAnimatables.push(animatable);
     }
 
     /**
@@ -124,5 +123,32 @@ export default class SceneManager {
         camera.attachControl(scene.getEngine().getRenderingCanvas(), true);
 
         this.camera = camera;
+        this.cameraOrgPosition = camera.position.clone();
+        this.cameraOrgTarget = camera.target.clone();
+    }
+
+    /**
+     * 加载并合并mesh
+     * @param url mesh url
+     */
+    private async loadAndMergerMeshAsync(url: string) {
+        const container = await SceneLoader.LoadAssetContainerAsync(url, undefined, this.scene);
+  
+        const meshGroup = groupby(container.meshes, mesh => {
+            if (mesh.name.indexOf("primitive") !== -1) {
+                return mesh.name.split('_')[0];
+            }
+            return undefined;
+        });
+
+        meshGroup.forEach((meshes, key) => {
+            if (meshes.length === 1 || !key) {
+                meshes.forEach(mesh => this.scene.addMesh(mesh));
+            }
+            else {
+                const merged = Mesh.MergeMeshes(meshes.map(mesh => mesh as Mesh), true, true, undefined, false, true);
+                if (merged) merged.name = key;
+            }
+        })
     }
 }
