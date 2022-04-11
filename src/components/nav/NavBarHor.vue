@@ -30,8 +30,8 @@ watch(() => route.path, (current, old, _) => {
         <CButton
             v-for="route in routes"
             :text="route.tag"
-            :radius="24"
-            :height="47"
+            :radius="20"
+            :height="40"
             :width="109"
             :is-active="currentPath === route.path"
             @click="onBtnClick(route.path)"
@@ -43,7 +43,7 @@ watch(() => route.path, (current, old, _) => {
 #container {
     border-radius: 24px;
     width: fit-content;
-    height: 47px;
+    height: 40px;
     background-color: #222631;
     display: flex;
     margin: 0 auto;

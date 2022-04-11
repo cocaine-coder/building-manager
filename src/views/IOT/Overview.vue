@@ -1,16 +1,25 @@
 <script lang="ts" setup>
 import IOTData from '../../components/iot/IOTData.vue';
-defineProps<{  }>();
+import IOTCounter from '../../components/iot/IOTCounter.vue';
+import CCard from '../../components/base/CCard.vue';
+import AirQuality from '../../components/iot/chart/AirQuality.vue';
+defineProps<{}>();
 </script>
 
 <template>
-    <IOTData id="data"></IOTData>
+    <CCard class="item" title="物联网设备统计">
+        <IOTCounter></IOTCounter>
+    </CCard>
+
+    <CCard class="item" title="近12小时空气质量趋势">
+        <AirQuality></AirQuality>
+    </CCard>
+
+    <IOTData class="item" id="data"></IOTData>
 </template>
 
 <style scoped>
-
-#data{
-    bottom: 40px;
-    left: 20px;
+.item{
+    margin-top: 20px;
 }
 </style>

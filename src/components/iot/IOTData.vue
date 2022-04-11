@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, reactive } from 'vue';
-import { NSpace } from 'naive-ui'
 import IOTDataItem, { IOTDataType, CheckFCType } from './IOTDataItem.vue'
 
 const temperatureCheck: CheckFCType = (value: number) => {
@@ -45,13 +44,18 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <n-space>
-        <IOTDataItem v-for="data in datas" v-bind="data"></IOTDataItem>
-    </n-space>
+    <div class="container">
+        <IOTDataItem class="item" v-for="data in datas" v-bind="data"></IOTDataItem>
+    </div>
 </template>
 
 <style scoped>
-.n-space {
+.container {
+    display: flex;
     width: fit-content;
+}
+
+.item{
+    margin-right: 20px;
 }
 </style>

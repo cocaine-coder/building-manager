@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import Home from './views/Home.vue';
 
-import IOT from './views/IOT/IOT.vue'
+import IOT from './views/IOT/index.vue'
 import IOTOverview from './views/IOT/Overview.vue';
 import IOTEnv from './views/IOT/Env.vue';
 import IOTSoil from './views/IOT/Soil.vue';
@@ -15,8 +15,6 @@ import Asset from './views/Asset.vue';
 import Fire from './views/Fire.vue';
 import Car from './views/Car.vue';
 import Pipeline from './views/Pipeline.vue';
-
-import { RouterEvent } from "./eventbus";
 
 export const routes = [
     { path: '/', component: Home, icon: "home", tag: "主页" },
