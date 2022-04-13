@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { Color3 } from '@babylonjs/core';
+import { Color3, Vector3 } from '@babylonjs/core';
 
 import SceneManager from '../../manager/SceneManager';
 import GuiContainer from './BJS-GUI-Follow-Container.vue'
 import CCard from '../base/CCard.vue';
 
 const props = defineProps<{
-    mesh: string,
+    mesh: string | Vector3,
     showContent: boolean,
     title?: string,
     overlayColor?: Color3,
@@ -19,13 +19,20 @@ const emits = defineEmits<{
     (e: 'close'): void
 }>();
 
-const target = SceneManager.Instance.scene.getMeshByName(props.mesh)!
+console.log(props.mesh);
+
+const target = typeof (props.mesh) === 'string' ?
+    SceneManager.Instance.scene.getMeshByName(props.mesh)! :
+    props.mesh;
+
 const show = ref(false);
 
 function onMarkerClick() {
     show.value = true;
-    SceneManager.Instance.setRenderOverlay
-        (props.mesh, props.overlayColor, props.overlayAlpha);
+
+    if (typeof (props.mesh) === 'string')
+        SceneManager.Instance.setRenderOverlay
+            (props.mesh, props.overlayColor, props.overlayAlpha);
 
     emits('markerClick');
 }
@@ -40,7 +47,7 @@ function onClose() {
 
 <template>
     <GuiContainer :mesh="target" :scene="SceneManager.Instance.scene" v-show="!(show && showContent)">
-        <div @click="onMarkerClick">
+        <div class="marker" @click="onMarkerClick">
             <slot></slot>
         </div>
     </GuiContainer>
@@ -52,5 +59,8 @@ function onClose() {
     </GuiContainer>
 </template>
 
-<style>
+<style scoped>
+.marker {
+    cursor: pointer;
+}
 </style>

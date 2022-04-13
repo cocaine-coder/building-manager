@@ -17,12 +17,12 @@ function onBtnClick(path: string) {
     currentPath.value = path;
 }
 
-watch(() => route.path, (current, old, _) => {
+watch(() => route.path, (current, _old, _) => {
     props.routes.forEach(value => {
         if (current.indexOf(value.path) !== -1)
             currentPath.value = value.path;
     })
-})
+},{immediate:true})
 </script>
 
 <template>

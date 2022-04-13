@@ -27,16 +27,15 @@ function onSceneReady(scene: Scene) {
   <div id="main">
     <SideBar></SideBar>
     <div id="container">
-      <SceneComponent
-        class="scene-container"
-        :onSceneReady="onSceneReady"
-        :onRender="undefined"
-        :antialias="true"
-        :adaptToDeviceRatio="true"
-      ></SceneComponent>
+      <SceneComponent class="scene-container" :onSceneReady="onSceneReady" :onRender="undefined" :antialias="true"
+        :adaptToDeviceRatio="true"></SceneComponent>
 
       <n-config-provider v-if="!loading" class="n-controls" :theme="darkTheme">
-        <router-view></router-view>
+        <router-view v-slot="{ Component }">
+            <keep-alive>
+              <component :is="Component" />
+            </keep-alive>
+        </router-view>
       </n-config-provider>
     </div>
   </div>
@@ -83,7 +82,7 @@ body {
   overflow: hidden;
 }
 
-.n-controls > * {
+.n-controls>* {
   pointer-events: visible;
 }
 </style>

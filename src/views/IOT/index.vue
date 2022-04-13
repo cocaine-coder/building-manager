@@ -8,7 +8,11 @@ const navs = routes.find(x => x.path === '/iot')?.children!;
 
 <template>
     <NavBarHor :routes="navs" :initPath="navs[0].path"></NavBarHor>
-    <router-view></router-view>
+    <router-view v-slot="{ Component }">
+            <keep-alive>
+                <component :is="Component" />
+            </keep-alive>
+    </router-view>
 </template>
 
 <style>

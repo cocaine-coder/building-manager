@@ -27,8 +27,8 @@ onUnmounted(() => {
 })
 
 function worldToScreen(target: Target, camera: Camera, scene: Scene) {
-    
     const isVector = target instanceof Vector3;
+    console.log(isVector,target);
     const point = isVector ? target : target.getBoundingInfo().boundingBox.center;
     const worldMatrix = isVector? Matrix.Identity() : target.getWorldMatrix();
     const transformMatrix = scene.getTransformMatrix();
