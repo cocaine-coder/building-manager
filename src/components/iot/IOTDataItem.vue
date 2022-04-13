@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { NCard, NSpace } from 'naive-ui'
 import { computed } from 'vue';
 import SvgIcon from '../base/SvgIcon.vue';
+import CCard from '../base/CCard.vue';
 
 export type level = 'good' | 'mid' | 'bad'
 
@@ -32,42 +32,44 @@ const state = computed(() => {
 </script>
 
 <template>
-    <n-card id="card">
-        <NSpace id="iot-title" justify="space-between">
-            <SvgIcon :name="icon" :size="iconSize || 0.25" color="#ffffff"></SvgIcon>
-            <div id="state" :style="{ backgroundColor: state }"></div>
-        </NSpace>
-        <NSpace id="iot-content">
-            <label id="iot-value">{{ props.value }}</label>
+    <CCard class="c-card">
+        <div class="title" justify="space-between">
+            <div>
+                <SvgIcon :name="icon" :size="iconSize || 0.25" color="#ffffff"></SvgIcon>
+            </div>
+            <div class="state" :style="{ backgroundColor: state }"></div>
+        </div>
+        <div class="content">
+            <label class="value">{{ props.value }}</label>
             <label v-if="props.unit">{{ props.unit }}</label>
-        </NSpace>
+        </div>
         <label>{{ props.name }}</label>
-    </n-card>
+    </CCard>
 </template>
 
 
 <style scoped>
-.n-card {
-    width: 150px;
-    border-radius: 20px;
-    background-color: rgb(24, 24, 28,0.6);
-    /* filter: blur(6px); */
+.c-card {
+    width: 100px;
 }
 
-#iot-title {
+.title {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
 }
 
-#iot-content {
-    margin-top: 20px;
+.content {
+    display: flex;
     align-items: baseline;
 }
 
-#iot-value {
+.value {
     font-size: 30px;
+    margin-right: 10px;
 }
 
-#state {
+.state {
     height: 10px;
     width: 10px;
     border-radius: 5px;

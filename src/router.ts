@@ -5,6 +5,7 @@ import IOT from './views/IOT/index.vue'
 import IOTOverview from './views/IOT/Overview.vue';
 import IOTEnv from './views/IOT/Env.vue';
 import IOTSoil from './views/IOT/Soil.vue';
+import WebCam from './views/IOT/WebCam.vue';
 import IOTFeedwater from './views/IOT/Feedwater.vue';
 import IOTRain from './views/IOT/Rain.vue';
 
@@ -24,11 +25,10 @@ export const routes = [
             { path: 'all', component: IOTOverview, tag: '概览' },
             { path: 'env', component: IOTEnv, tag: '环境' },
             { path: 'soil', component: IOTSoil, tag: '土壤' },
-            { path: 'feedwater', component: IOTFeedwater, tag: '给水' },
-            { path: 'rain', component: IOTRain, tag: '雨水' },
+            { path: 'webcam', component:WebCam, tag:'摄像头'}
         ]
     },
-    { path: '/security', component: Security, icon: "security", tag: "安防" },
+    // { path: '/security', component: Security, icon: "security", tag: "安防" },
     { path: '/greenery', component: Greenery, icon: "tree", tag: "绿化" },
     { path: '/tenant', component: Tenant, icon: "tenant", tag: "租户管理" },
     { path: '/asset', component: Asset, icon: "asset", tag: "资产管理" },

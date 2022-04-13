@@ -1,11 +1,10 @@
 <script lang="ts" setup>
-import { computed, onUnmounted, ref } from 'vue';
-import { NDrawer, NDrawerContent } from 'naive-ui';
+import { onUnmounted, ref } from 'vue';
 import { Color3 } from '@babylonjs/core';
-
-import GuiContainer from '../components/layout/BJS-GUI-Follow-Container.vue';
-import SceneManager from '../manager/SceneManager';
 import point from '../assets/imgs/point.png';
+
+import SceneManager from '../manager/SceneManager';
+import ContentMarkerContainer from '../components/layout/ContentMarkerContainer.vue';
 
 type OtherItemInfo = {
     name: string
@@ -20,8 +19,13 @@ const overlayColor = Color3.FromHexString("#009cdb");
 const overlayAlpha = 0.5;
 const others = new Map<string, OtherInfo>(
     [
-        ["Roof",{name:"园科大厦",items:[]}],
-        ["other1", { name: "宏智大厦-B区", items: [{ name: "欧之漫超市" }, { name: "亿智行地产" }, { name: "苏州京卓智信息科技有限公司" }] }],
+        ["Roof", { name: "园科大厦", items: [] }],
+        ["other1", {
+            name: "宏智大厦-B区", items: [
+                { name: "欧之漫超市" },
+                { name: "亿智行地产" },
+                { name: "苏州京卓智信息科技有限公司" }]
+        }],
         ["other2", {
             name: "广鸿大厦", items: [
                 { name: "苏州普腾信息科技有限公司" },
@@ -50,67 +54,43 @@ const others = new Map<string, OtherInfo>(
     ]
 )
 
-const showOuter = ref(false);
-const key = ref("");
-const info = computed(() => {
-    return others.get(key.value);
-})
+const key = ref('');
 
-function onMarkerClick(name: string) {
-    SceneManager.Instance.scene.meshes.forEach(mesh => mesh.renderOverlay = false);
-    SceneManager.Instance.scene.getMeshByName(name)!.overlayColor = overlayColor;
-    SceneManager.Instance.scene.getMeshByName(name)!.overlayAlpha = overlayAlpha;
-    SceneManager.Instance.scene.getMeshByName(name)!.renderOverlay = true;
-
+function onMarkerClick(name:string){
     key.value = name;
-    showOuter.value = true;
-}
-
-function onUpdateShow(show: boolean) {
-    console.log(show)
-    if (!show) {
-        SceneManager.Instance.scene.meshes.forEach(mesh => mesh.renderOverlay = false);
-    }
 }
 
 onUnmounted(() => {
-    SceneManager.Instance.scene.meshes.forEach(mesh => mesh.renderOverlay = false);
+    SceneManager.Instance.setRenderOverlay();
 })
 </script>
 
 <template>
-    <GuiContainer
-        v-for="other in others"
-        :key="other[0]"
-        :mesh="SceneManager.Instance.scene.getMeshByName(other[0])!"
-    >
-        <div class="marker" @click="onMarkerClick(other[0])">
+    <ContentMarkerContainer v-for="other in others" 
+        :mesh="other[0]" 
+        :title="other[1].name" 
+        :overlayColor="overlayColor"
+        :overlayAlpha="overlayAlpha"
+        :showContent = "key === other[0]"
+        @markerClick="onMarkerClick(other[0])">
+        <div class="marker">
             <img :src="point" :width="25" :height="25" />
             {{ other[1].name }}
         </div>
-    </GuiContainer>
 
-    <n-drawer
-        v-model:show="showOuter"
-        :width="502"
-        :mask-closable="false"
-        @update-show="onUpdateShow"
-    >
-        <n-drawer-content :title="info?.name" :closable="true">
+        <template #content>
             <ul>
-                <li v-for="item in info?.items">
-                    {{item.name}}
+                <li v-for="item in other[1].items">
+                    {{ item.name }}
                 </li>
             </ul>
-            <template #footer></template>
-        </n-drawer-content>
-    </n-drawer>
+        </template>
+    </ContentMarkerContainer>
 </template>
 
 <style>
 .marker {
     display: flex;
-    align-items: center;
     cursor: pointer;
 }
 

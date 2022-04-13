@@ -27,10 +27,8 @@ watch(()=>route.path,(current,old,_)=>{
 </script>
 
 <template>
-    <n-space vertical id="sidebar">
-            <!-- <SvgIcon name="logo" :height="40" :width="40" @click="clickLogoHanlder"></SvgIcon> -->
-        
-        <CButton id="logo"
+    <n-space vertical class="sidebar">
+        <CButton class="logo"
                 icon="logo" 
                 text="logo" 
                 :size="2" 
@@ -59,12 +57,12 @@ watch(()=>route.path,(current,old,_)=>{
 </template>
 
 <style scoped>
-#sidebar {
+.sidebar {
     background-color: #222631;
-    padding: 15px 10px;
+    padding: 15px 5px;
 }
 
-#logo {
+.logo {
     margin-bottom: 5px;
 }
 

@@ -1,4 +1,4 @@
-import {  Animation, Animatable, ArcRotateCamera,CubicEase, GlowLayer, Mesh, Scene, SceneLoader, Vector3, EasingFunction, MeshBuilder } from "@babylonjs/core";
+import { Animation, Animatable, ArcRotateCamera, CubicEase, GlowLayer, Mesh, Scene, SceneLoader, Vector3, EasingFunction, MeshBuilder, Color3 } from "@babylonjs/core";
 
 import SkyManager from "./SkyManager";
 import MainBuildingManager from "./MainBuildingManager";
@@ -52,7 +52,7 @@ export default class SceneManager {
         this.createMainCamera(scene);
         this.sky = new SkyManager(scene);
 
-        await Promise.all([groundModel,mainModel,otherModel,treeModel,undergroundModel].map(model=>{
+        await Promise.all([groundModel, mainModel, otherModel, treeModel, undergroundModel].map(model => {
             return this.loadAndMergerMeshAsync(model);
         }));
 
@@ -67,7 +67,7 @@ export default class SceneManager {
         });
         gl.intensity = 1;
 
-        this.mainBuildingManager = new MainBuildingManager(scene);
+        //this.mainBuildingManager = new MainBuildingManager(scene);
         this.addWindowKeyboardEvent();
     }
 
@@ -86,6 +86,18 @@ export default class SceneManager {
         const animatable = Animation.CreateAndStartAnimation("flyto", this.camera, property, 60, 120, from, to, 0, ease, onAnimationEnd);
         if (animatable)
             this.cameraAnimatables.push(animatable);
+    }
+
+    setRenderOverlay(name?: string, color?: Color3, alpha?: number) {
+        this.scene.meshes.forEach(mesh => {
+            if(mesh.name === name){
+                if(color) mesh.overlayColor = color;
+                if(alpha) mesh.overlayAlpha = alpha;
+                mesh.renderOverlay = true;
+            }
+            else
+                mesh.renderOverlay = false;
+        })
     }
 
     /**
@@ -133,7 +145,7 @@ export default class SceneManager {
      */
     private async loadAndMergerMeshAsync(url: string) {
         const container = await SceneLoader.LoadAssetContainerAsync(url, undefined, this.scene);
-  
+
         const meshGroup = groupby(container.meshes, mesh => {
             if (mesh.name.indexOf("primitive") !== -1) {
                 return mesh.name.split('_')[0];
